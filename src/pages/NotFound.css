@@ -1,0 +1,40 @@
+.notfound {
+  position: relative;
+  overflow: hidden;
+  min-height: 78vh;
+  display: flex;
+  align-items: center;
+  padding-top: var(--header-h);
+}
+.notfound__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 60% 60% at 50% 30%, color-mix(in srgb, var(--lime-500) 16%, transparent), transparent 60%),
+    linear-gradient(color-mix(in srgb, var(--mint-500) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--mint-500) 6%, transparent) 1px, transparent 1px);
+  background-size: auto, 50px 50px, 50px 50px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 40%, #000, transparent 85%);
+  pointer-events: none;
+}
+.notfound__inner {
+  position: relative;
+  max-width: 54ch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.notfound__code {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(4rem, 16vw, 9rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--lime-500);
+}
+.notfound__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}

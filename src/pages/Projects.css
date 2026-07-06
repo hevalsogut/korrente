@@ -1,0 +1,78 @@
+.proj-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 2.5vw, 1.6rem);
+}
+.proj-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: clamp(1.4rem, 3vw, 1.9rem);
+  border-radius: var(--radius-lg);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  transition: transform var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+.proj-card:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--green-500) 45%, var(--border));
+  box-shadow: var(--shadow-lg);
+}
+.proj-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+.proj-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.proj-status__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.proj-status--operational { color: var(--green-400); border-color: color-mix(in srgb, var(--green-500) 40%, transparent); }
+.proj-status--construction { color: #E6C15A; border-color: color-mix(in srgb, #E6C15A 40%, transparent); }
+.proj-status--development { color: var(--text-on-dark-muted); }
+
+.proj-card__cap {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+.proj-card__name {
+  font-size: var(--step-1);
+}
+.proj-card__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  font-size: var(--step--1);
+  color: var(--text-muted);
+}
+.proj-card__loc svg { color: var(--green-400); flex-shrink: 0; }
+
+@media (max-width: 900px) {
+  .proj-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .proj-grid { grid-template-columns: 1fr; }
+}

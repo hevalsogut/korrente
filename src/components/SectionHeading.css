@@ -1,0 +1,23 @@
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 62ch;
+}
+
+.section-heading__title {
+  margin-top: var(--space-2xs);
+}
+
+.section-heading__lead {
+  max-width: 56ch;
+}
+
+.section-heading--center {
+  align-items: center;
+  text-align: center;
+  margin-inline: auto;
+}
+.section-heading--center .section-heading__lead {
+  margin-inline: auto;
+}

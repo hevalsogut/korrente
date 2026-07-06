@@ -1,0 +1,49 @@
+.contact-cta {
+  background: var(--ink-800);
+  color: var(--text-on-dark);
+}
+
+.contact-cta__panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  padding: clamp(2.5rem, 7vw, 6rem) clamp(1.5rem, 6vw, 5rem);
+  background: linear-gradient(135deg, var(--ink-700), var(--ink-900));
+  border: 1px solid var(--ink-600);
+  text-align: center;
+}
+
+.contact-cta__glow {
+  position: absolute;
+  inset: -30% 20% auto -10%;
+  height: 380px;
+  background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--lime-500) 30%, transparent), transparent 60%),
+    radial-gradient(circle at 80% 60%, color-mix(in srgb, var(--mint-500) 24%, transparent), transparent 55%);
+  filter: blur(20px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.contact-cta__content {
+  position: relative;
+  max-width: 40ch;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+.contact-cta__title {
+  max-width: 16ch;
+}
+.contact-cta__body {
+  color: var(--text-on-dark-muted);
+  max-width: 46ch;
+}
+.contact-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: center;
+  margin-top: var(--space-lg);
+}

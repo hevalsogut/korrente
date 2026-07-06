@@ -1,0 +1,33 @@
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  padding-top: calc(var(--header-h) + clamp(2.5rem, 7vw, 5rem));
+  padding-bottom: clamp(2.5rem, 7vw, 5rem);
+}
+
+.page-hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(ellipse 60% 90% at 85% -10%, color-mix(in srgb, var(--lime-500) 16%, transparent), transparent 60%),
+    linear-gradient(color-mix(in srgb, var(--mint-500) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--mint-500) 7%, transparent) 1px, transparent 1px);
+  background-size: auto, 52px 52px, 52px 52px;
+  mask-image: linear-gradient(180deg, #000 30%, transparent 100%);
+  pointer-events: none;
+}
+
+.page-hero__inner {
+  position: relative;
+  max-width: 70ch;
+}
+.page-hero__title {
+  margin-top: var(--space-md);
+}
+.page-hero__lead {
+  margin-top: var(--space-lg);
+  max-width: 60ch;
+}
+.page-hero__extra {
+  margin-top: var(--space-xl);
+}
