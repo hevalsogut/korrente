@@ -1,0 +1,55 @@
+/* Meta row under the hero title (status · capacity · location) */
+.proj-detail__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+.proj-detail__cap {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-on-dark);
+}
+.proj-detail__loc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-on-dark-muted);
+}
+.proj-detail__loc svg { color: var(--green-400); flex-shrink: 0; }
+
+/* Back link */
+.proj-detail__back {
+  margin: 0 0 var(--space-xl);
+}
+.proj-detail__back-icon {
+  transform: rotate(180deg);
+}
+
+/* Body copy */
+.proj-detail__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  color: var(--text-on-light-muted);
+  font-size: var(--step-0);
+  line-height: 1.7;
+}
+.proj-detail__body p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* Loading / not-found states */
+.proj-detail-status {
+  min-height: 40vh;
+  display: flex;
+  align-items: center;
+}
+.proj-detail-status__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-md);
+}

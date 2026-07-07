@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PageHero from '../components/PageHero.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
-import { articles } from '../data/content.js'
+import { articles as staticArticles } from '../data/content.js'
+import { fetchArticles } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './News.css'
 
@@ -13,6 +15,13 @@ const ALL = '__all__'
 export default function News() {
   const { t, pick, lang } = useI18n()
   const [filter, setFilter] = useState(ALL)
+  const [articles, setArticles] = useState(staticArticles)
+
+  useEffect(() => {
+    fetchArticles()
+      .then(setArticles)
+      .catch((err) => console.warn('Falling back to static articles:', err))
+  }, [])
 
   const formatDate = (iso) =>
     new Date(iso).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', {
@@ -69,12 +78,14 @@ export default function News() {
                   <span className="article-meta__dot" aria-hidden="true">·</span>
                   <span>{pick(featured.readingTime)} {t('common.readSuffix')}</span>
                 </div>
-                <h2 className="feature-article__title h3">{pick(featured.title)}</h2>
+                <h2 className="feature-article__title h3">
+                  <Link to={`/news/${featured.slug}`}>{pick(featured.title)}</Link>
+                </h2>
                 <p className="feature-article__excerpt lead">{pick(featured.excerpt)}</p>
-                <a href="#" className="article-link" onClick={(e) => e.preventDefault()}>
+                <Link to={`/news/${featured.slug}`} className="article-link">
                   {t('common.readArticle')}
                   <Icon name="arrowUpRight" size={18} />
-                </a>
+                </Link>
               </div>
             </article>
           </Reveal>
@@ -110,10 +121,10 @@ export default function News() {
                   <span>{formatDate(article.date)}</span>
                 </div>
                 <h3 className="news-card__title h4">
-                  <a href="#" onClick={(e) => e.preventDefault()}>
+                  <Link to={`/news/${article.slug}`}>
                     <span className="news-card__stretch" />
                     {pick(article.title)}
-                  </a>
+                  </Link>
                 </h3>
                 <p className="news-card__excerpt text-muted">{pick(article.excerpt)}</p>
                 <span className="news-card__foot">{pick(article.readingTime)} {t('common.readSuffix')}</span>

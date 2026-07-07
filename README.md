@@ -18,8 +18,9 @@ SVG energy illustrations (the hero shows a neon-bolt storage container).
 ## Quick start
 
 ```bash
-npm install      # install dependencies
-npm run dev      # start the dev server at http://localhost:5173
+npm install           # install dependencies
+cp .env.example .env  # set up environment variables for CMS
+npm run dev           # start the dev server at http://localhost:5173
 ```
 
 Then open <http://localhost:5173> (it opens automatically).
@@ -47,7 +48,7 @@ host (Netlify, Vercel, Cloudflare Pages, S3, GitHub Pages, nginx…).
 | Choice | Why |
 | --- | --- |
 | **Vite + React 18** | Instant dev server, tiny fast production build, and a component model that keeps the many sections/pages organized and reusable. No framework overhead beyond what a marketing site needs. |
-| **React Router** | Clean multi-page routing (Home, Solutions, Technology, Projects, Company/About, News, Careers, Sustainability, Contact, 404) with a shared layout. |
+| **React Router** | Clean multi-page routing (Home, Solutions, Technology, Projects, Company/About, News, Careers, Sustainability, Contact, 404) plus dynamic detail pages (`/:slug`) with a shared layout. |
 | **Plain CSS + custom properties** | A real, transparent design system in `src/index.css` — colour/spacing/type/radii/shadow/motion **tokens** any developer can read and extend. No build-time CSS-in-JS, no Tailwind class soup, no runtime cost. Each component ships its own small `.css` file next to it. |
 | **Custom lightweight i18n** | A ~40-line context (`src/i18n/`) drives the EN/TR switch — no i18n library. UI strings live in `src/i18n/ui.js`; content is bilingual in `src/data/*`. Language is remembered in `localStorage` and detected from the browser on first visit. |
 | **No UI kit / icon package** | The look is original. Icons are a small inline SVG set (`src/components/Icon.jsx`); all imagery is CSS/SVG-based (see `HeroScene.jsx`), so there are **no copyrighted or external assets** and nothing to lazy-load incorrectly. |
@@ -78,7 +79,9 @@ korrente/
 │   │   ├── site.js           #   company details, nav, socials, footer, legal
 │   │   ├── services.js       #   the six solutions/services
 │   │   └── content.js        #   values, stats, testimonials, timeline, team,
-│   │                         #   commitments, articles, projects, roles
+│   │                         #   commitments, articles, projects, roles (fallback data)
+│   ├── lib/
+│   │   └── strapi.js         #   Strapi fetch helpers (articles, projects, roles)
 │   ├── components/           # reusable UI (Header, Footer, Button, Reveal,
 │   │                         #   Counter, Icon, HeroScene, LanguageSwitcher…)
 │   └── pages/                # one folder-mate .jsx + .css per page
@@ -86,14 +89,41 @@ korrente/
 │       ├── Solutions.jsx / .css
 │       ├── Technology.jsx / .css
 │       ├── Projects.jsx / .css
+│       ├── ProjectDetail.jsx / .css
 │       ├── About.jsx / .css       (nav label: “Company”)
 │       ├── News.jsx / .css
+│       ├── ArticleDetail.jsx / .css
 │       ├── Careers.jsx / .css
+│       ├── CareerDetail.jsx / .css
 │       ├── Sustainability.jsx / .css
 │       ├── Contact.jsx / .css
 │       └── NotFound.jsx / .css
 └── README.md
 ```
+
+---
+
+## CMS integration (Strapi)
+
+Three content types are CMS-driven: **Articles** (News), **Projects**
+(Projects), and **Roles** (Careers). Set `VITE_STRAPI_URL` in `.env` to your
+Strapi instance's base URL (see `.env.example`):
+
+```bash
+VITE_STRAPI_URL=https://YOUR-PROJECT.strapiapp.com
+```
+
+`src/lib/strapi.js` fetches from `${VITE_STRAPI_URL}/api/...` and maps Strapi
+5's flattened response (`documentId` + per-locale fields like `titleEn` /
+`titleTr`) back into the same bilingual shapes (`{ en, tr }`) the pages already
+expect from `src/data/content.js`.
+
+Each of `News.jsx`, `Projects.jsx`, and `Careers.jsx` initializes its state
+from the static array in `src/data/content.js`, then fetches from Strapi in a
+`useEffect`. If the request fails (unset `VITE_STRAPI_URL`, network error, CMS
+down), it logs a `console.warn` and keeps rendering the static fallback — the
+page never shows an error state, and `npm run build` still produces a fully
+working static site offline.
 
 ---
 

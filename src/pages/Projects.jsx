@@ -1,14 +1,17 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PageHero from '../components/PageHero.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
 import StatsBand from '../components/StatsBand.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
-import { projects } from '../data/content.js'
+import { projects as staticProjects } from '../data/content.js'
+import { fetchProjects } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Projects.css'
 
-const statusKey = {
+export const statusKey = {
   operational: 'projects.statusOperational',
   construction: 'projects.statusConstruction',
   development: 'projects.statusDevelopment'
@@ -16,6 +19,13 @@ const statusKey = {
 
 export default function Projects() {
   const { t, pick, lang } = useI18n()
+  const [projects, setProjects] = useState(staticProjects)
+
+  useEffect(() => {
+    fetchProjects()
+      .then(setProjects)
+      .catch((err) => console.warn('Falling back to static projects:', err))
+  }, [])
 
   const seo = {
     en: { title: 'Projects', description: 'Storage and generation projects Korrente has developed, built, and operates across Europe.' },
@@ -39,7 +49,12 @@ export default function Projects() {
                   </span>
                   <span className="proj-card__cap">{p.capacity}</span>
                 </div>
-                <h2 className="proj-card__name h4">{p.name}</h2>
+                <h2 className="proj-card__name h4">
+                  <Link to={`/projects/${p.slug}`}>
+                    <span className="proj-card__stretch" />
+                    {p.name}
+                  </Link>
+                </h2>
                 <p className="proj-card__type text-muted">{pick(p.type)}</p>
                 <p className="proj-card__loc">
                   <Icon name="pin" size={16} />

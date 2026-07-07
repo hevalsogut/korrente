@@ -1,10 +1,13 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import PageHero from '../components/PageHero.jsx'
 import Reveal from '../components/Reveal.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import Icon from '../components/Icon.jsx'
-import { roles } from '../data/content.js'
+import { roles as staticRoles } from '../data/content.js'
+import { fetchRoles } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Careers.css'
 
@@ -12,6 +15,13 @@ const cultureIcons = ['spark', 'leaf', 'compass']
 
 export default function Careers() {
   const { t, pick, lang } = useI18n()
+  const [roles, setRoles] = useState(staticRoles)
+
+  useEffect(() => {
+    fetchRoles()
+      .then(setRoles)
+      .catch((err) => console.warn('Falling back to static roles:', err))
+  }, [])
 
   const seo = {
     en: { title: 'Careers', description: 'Join Korrente — engineers, developers, and operators building clean, dependable energy across Europe.' },
@@ -50,7 +60,7 @@ export default function Careers() {
           <ul className="roles" role="list">
             {roles.map((r, i) => (
               <Reveal as="li" className="role" key={r.id} delay={i * 60}>
-                <a href="#" className="role__link" onClick={(e) => e.preventDefault()}>
+                <Link to={`/careers/${r.slug}`} className="role__link">
                   <span className="role__main">
                     <span className="role__title">{pick(r.title)}</span>
                     <span className="role__meta">
@@ -61,7 +71,7 @@ export default function Careers() {
                     {t('careers.apply')}
                     <Icon name="arrowUpRight" size={18} />
                   </span>
-                </a>
+                </Link>
               </Reveal>
             ))}
           </ul>

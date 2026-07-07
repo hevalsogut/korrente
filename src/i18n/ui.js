@@ -177,7 +177,11 @@ export const ui = {
       newsletterTitle: 'Get our monthly field notes.',
       newsletterBody:
         'One considered email a month on clean energy, the grid, and what we’re learning building it. No noise.',
-      emailPlaceholder: 'you@company.com'
+      emailPlaceholder: 'you@company.com',
+      backToNews: 'Back to Insights',
+      loading: 'Loading article…',
+      notFoundTitle: 'Article not found.',
+      notFoundBody: 'This article may have moved or never existed.'
     },
     contact: {
       eyebrow: 'Contact',
@@ -244,7 +248,11 @@ export const ui = {
       statusConstruction: 'Under construction',
       statusDevelopment: 'In development',
       ctaTitle: 'Have a site or a project in mind?',
-      ctaBody: 'From bare land to grid connection, our team can map the fastest credible path to a built, operating asset.'
+      ctaBody: 'From bare land to grid connection, our team can map the fastest credible path to a built, operating asset.',
+      backToProjects: 'Back to Projects',
+      loading: 'Loading project…',
+      notFoundTitle: 'Project not found.',
+      notFoundBody: 'This project may have moved or never existed.'
     },
     careers: {
       eyebrow: 'Careers',
@@ -262,7 +270,13 @@ export const ui = {
       rolesTitle: 'Where you could come in.',
       apply: 'View role',
       ctaTitle: 'Don’t see your role?',
-      ctaBody: 'We’re always glad to meet people who care about clean energy. Send us a note and tell us what you’d build.'
+      ctaBody: 'We’re always glad to meet people who care about clean energy. Send us a note and tell us what you’d build.',
+      backToCareers: 'Back to Careers',
+      loading: 'Loading position…',
+      notFoundTitle: 'Position not found.',
+      notFoundBody: 'This position may have moved or never existed.',
+      applyNow: 'Apply now',
+      applySubject: 'Application: {title}'
     },
     notFound: {
       title: 'This page went off-grid.',
@@ -443,7 +457,11 @@ export const ui = {
       newsletterTitle: 'Aylık saha notlarımızı alın.',
       newsletterBody:
         'Temiz enerji, şebeke ve inşa ederken öğrendiklerimiz üzerine ayda bir özenli e-posta. Gürültü yok.',
-      emailPlaceholder: 'siz@sirket.com'
+      emailPlaceholder: 'siz@sirket.com',
+      backToNews: 'İçgörülere dön',
+      loading: 'Yazı yükleniyor…',
+      notFoundTitle: 'Yazı bulunamadı.',
+      notFoundBody: 'Bu yazı taşınmış ya da hiç var olmamış olabilir.'
     },
     contact: {
       eyebrow: 'İletişim',
@@ -510,7 +528,11 @@ export const ui = {
       statusConstruction: 'Yapım aşamasında',
       statusDevelopment: 'Geliştirmede',
       ctaTitle: 'Aklınızda bir saha veya proje mi var?',
-      ctaBody: 'Boş araziden şebeke bağlantısına kadar ekibimiz, kurulmuş ve işleyen bir varlığa giden en hızlı güvenilir yolu çıkarabilir.'
+      ctaBody: 'Boş araziden şebeke bağlantısına kadar ekibimiz, kurulmuş ve işleyen bir varlığa giden en hızlı güvenilir yolu çıkarabilir.',
+      backToProjects: 'Projelere dön',
+      loading: 'Proje yükleniyor…',
+      notFoundTitle: 'Proje bulunamadı.',
+      notFoundBody: 'Bu proje taşınmış ya da hiç var olmamış olabilir.'
     },
     careers: {
       eyebrow: 'Kariyer',
@@ -528,7 +550,13 @@ export const ui = {
       rolesTitle: 'Nerede yer alabilirsiniz.',
       apply: 'Pozisyonu gör',
       ctaTitle: 'Pozisyonunuzu göremediniz mi?',
-      ctaBody: 'Temiz enerjiyi önemseyen insanlarla tanışmaktan her zaman memnuniyet duyarız. Bize yazın ve neyi inşa edeceğinizi anlatın.'
+      ctaBody: 'Temiz enerjiyi önemseyen insanlarla tanışmaktan her zaman memnuniyet duyarız. Bize yazın ve neyi inşa edeceğinizi anlatın.',
+      backToCareers: 'Kariyere dön',
+      loading: 'Pozisyon yükleniyor…',
+      notFoundTitle: 'Pozisyon bulunamadı.',
+      notFoundBody: 'Bu pozisyon taşınmış ya da hiç var olmamış olabilir.',
+      applyNow: 'Şimdi başvur',
+      applySubject: 'Başvuru: {title}'
     },
     notFound: {
       title: 'Bu sayfa şebeke dışına çıktı.',
