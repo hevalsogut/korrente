@@ -5,6 +5,7 @@ import Home from './pages/Home.jsx'
 import About from './pages/About.jsx'
 import Solutions from './pages/Solutions.jsx'
 import Technology from './pages/Technology.jsx'
+import Calculator from './pages/Calculator.jsx'
 import Projects from './pages/Projects.jsx'
 import ProjectDetail from './pages/ProjectDetail.jsx'
 import Careers from './pages/Careers.jsx'
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="about" element={<About />} />
           <Route path="solutions" element={<Solutions />} />
           <Route path="technology" element={<Technology />} />
+          <Route path="calculator" element={<Calculator />} />
           <Route path="projects" element={<Projects />} />
           <Route path="projects/:slug" element={<ProjectDetail />} />
           <Route path="careers" element={<Careers />} />

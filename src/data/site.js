@@ -22,6 +22,7 @@ export const navLinks = [
   { to: '/solutions', label: { en: 'Solutions', tr: 'Çözümler' } },
   { to: '/technology', label: { en: 'Technology', tr: 'Teknoloji' } },
   { to: '/projects', label: { en: 'Projects', tr: 'Projeler' } },
+  { to: '/calculator', label: { en: 'Revenue Calculator', tr: 'Gelir Hesaplayıcı' } },
   { to: '/about', label: { en: 'Company', tr: 'Şirket' } },
   { to: '/news', label: { en: 'News', tr: 'Haberler' } },
   { to: '/careers', label: { en: 'Careers', tr: 'Kariyer' } }

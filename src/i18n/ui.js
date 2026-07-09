@@ -27,7 +27,9 @@ export const ui = {
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
       changeLanguage: 'Change language',
-      optional: '(optional)'
+      optional: '(optional)',
+      showMore: 'Show more',
+      showLess: 'Show less'
     },
     footer: {
       pitch:
@@ -282,6 +284,109 @@ export const ui = {
       title: 'This page went off-grid.',
       lead:
         'The page you’re looking for may have moved or never existed. Let’s get you back to something powered up.'
+    },
+    calculator: {
+      eyebrow: 'Revenue Calculator',
+      title: 'Estimate battery storage revenue.',
+      lead:
+        'A quick model for Netherlands grid-arbitrage revenue from battery storage. Defaults are pre-filled — change only what you know.',
+      inputsTitle: 'Project inputs',
+      modeLabel: 'Mode',
+      modeGrid: 'Grid Arbitrage',
+      modeSolar: 'Solar-Paired',
+      powerLabel: 'Power rating',
+      powerHelp: 'The project’s power rating, in megawatts.',
+      durationLabel: 'Duration',
+      durationHelp: 'Storage duration at rated power. Longer duration cycles more gently, giving higher efficiency.',
+      durationUnit: 'hours',
+      advancedToggle: 'Advanced parameters',
+      advancedNote: 'Pre-filled with Netherlands market and engineering defaults. Edit any value to override it.',
+      groupCore: 'Core assumptions',
+      groupDegradation: 'Degradation',
+      groupStacking: 'Revenue stacking',
+      groupSolar: 'Solar assumptions',
+      groupLifecycle: 'Lifetime economics',
+      fields: {
+        priceSpread: { label: 'Price spread', help: 'Average daily gap between cheap and expensive hours on the Dutch day-ahead market. The biggest driver of revenue — edit only if you have your own market data.', unit: '€/MWh' },
+        dod: { label: 'Depth of discharge', help: 'Usable share of nameplate capacity per cycle.', unit: '%' },
+        cycles: { label: 'Cycles per year', help: 'Higher cycle counts increase battery wear. The degradation rate here assumes roughly one cycle per day — heavy multi-cycle use would wear the battery faster than shown.', unit: 'cycles/yr' },
+        life: { label: 'Project life', help: 'Expected operating life of the asset.', unit: 'years' },
+        capexPower: { label: 'CAPEX — power block', help: 'Power-conversion system cost per kW of rated power.', unit: '€/kW' },
+        capexEnergy: { label: 'CAPEX — energy block', help: 'Battery cell/energy cost per kWh of nameplate capacity.', unit: '€/kWh' },
+        opex: { label: 'OPEX', help: 'Annual operating cost as a share of total CAPEX.', unit: '% of CAPEX' },
+        degradationPerCycle: { label: 'Degradation per cycle', help: 'Capacity lost per full charge/discharge cycle. Combined with cycles per year, this is what drives throughput-based wear.', unit: '%/cycle' },
+        calendarDegradation: { label: 'Calendar degradation', help: 'Capacity lost per year regardless of cycling — ageing that happens even if the battery is never used.', unit: '%/yr' },
+        fcrPrice: { label: 'FCR capacity price', help: 'Annual capacity payment per MW allocated to frequency containment reserve.', unit: '€/MW/yr' },
+        balancingPrice: { label: 'Balancing capacity price', help: 'Annual capacity payment per MW allocated to balancing (aFRR/mFRR).', unit: '€/MW/yr' },
+        specificYield: { label: 'Specific yield', help: 'Expected annual solar generation per kWp installed.', unit: 'kWh/kWp/yr' },
+        summerShare: { label: 'Summer generation share', help: 'Share of annual solar generation produced in the summer half of the year. Winter is the remainder.', unit: '%' },
+        selfConsumption: { label: 'Self-consumption rate', help: 'Share of solar generation consumed on-site (with battery support) rather than exported.', unit: '%' },
+        retailImport: { label: 'Retail import price', help: 'What you’d otherwise pay to import this energy from the grid — the value of self-consumed solar.', unit: '€/kWh' },
+        feedInTariff: { label: 'Feed-in tariff', help: 'Price paid for exported solar once net metering ends (post-2027).', unit: '€/kWh' },
+        discountRate: { label: 'Discount rate', help: 'Used to discount future cashflows for NPV and LCOS.', unit: '%' },
+        chargingPrice: { label: 'Charging price', help: 'Assumed average price paid to recharge the battery. Shown per year for reference; kept separate from LCOS so it isn’t counted twice against the net spread.', unit: '€/MWh' }
+      },
+      solar: {
+        pvSizeLabel: 'PV size',
+        pvSizeHelp: 'Installed solar capacity paired with this battery.',
+        consumptionLabel: 'Annual site consumption',
+        consumptionHelp: 'Optional — caps self-consumption at actual site demand. Leave at 0 to ignore.',
+        netMeteringLabel: 'Net metering (pre-2027)',
+        netMeteringHelp: 'On values exported solar at the retail import price, matching today’s salderingsregeling. Off applies the lower post-2027 feed-in tariff instead, making self-consumption the main value driver.'
+      },
+      stacking: {
+        sectionNote: 'Capacity given to FCR or balancing is capacity taken away from arbitrage — allocations always split 100% of the battery, never stack additively.',
+        fcrToggle: 'Allocate to FCR',
+        fcrAllocLabel: 'FCR allocation',
+        balancingToggle: 'Allocate to balancing',
+        balancingAllocLabel: 'Balancing allocation',
+        ineligible: 'Not eligible at {h}h duration — needs at least {min}h to qualify.',
+        clampedWarning: 'FCR and balancing allocations added up to more than 100% and were scaled down proportionally.',
+        allocationTitle: 'Capacity allocation',
+        allocArbitrage: 'Arbitrage',
+        allocFcr: 'FCR',
+        allocBalancing: 'Balancing'
+      },
+      lifecycle: {
+        sectionTitle: 'Lifetime economics',
+        lcos: 'Levelised cost of storage (LCOS)',
+        npv: 'Net present value (NPV)',
+        viable: 'Viable on arbitrage alone at current assumptions.',
+        notViable: 'Not viable on arbitrage alone — consider revenue stacking.',
+        viabilityNote: 'Compares the net spread captured per MWh discharged ({spread}) against LCOS ({lcos}).',
+        tableTitle: 'Per-year cashflow',
+        tableNote: 'Read-only projection over the project life, using the degradation curve above.',
+        colYear: 'Year',
+        colSoh: 'SoH',
+        colEnergy: 'Energy discharged (MWh)',
+        colNet: 'Net cashflow',
+        colDiscounted: 'Discounted net'
+      },
+      solarResults: {
+        sectionTitle: 'Solar economics',
+        selfConsumedValue: 'Self-consumed value',
+        exportedValue: 'Exported value',
+        seasonalTitle: 'Seasonal generation',
+        summer: 'Summer',
+        winter: 'Winter'
+      },
+      resultsTitle: 'Estimated results',
+      auto: 'auto',
+      notViable: 'Not viable on arbitrage alone',
+      results: {
+        nameplate: 'Nameplate capacity',
+        usable: 'Usable capacity',
+        rte: 'System RTE',
+        capex: 'Total CAPEX',
+        capexPerKwh: 'CAPEX per kWh',
+        grossRevenue: 'Annual gross revenue',
+        netIncome: 'Annual net income',
+        payback: 'Simple payback',
+        roi: 'ROI'
+      },
+      years: 'years',
+      disclaimer:
+        'Estimates only, based on the assumptions above. Not investment advice — actual project economics depend on site-specific market, engineering, and financing conditions.'
     }
   },
 
@@ -306,7 +411,9 @@ export const ui = {
       openMenu: 'Menüyü aç',
       closeMenu: 'Menüyü kapat',
       changeLanguage: 'Dili değiştir',
-      optional: '(isteğe bağlı)'
+      optional: '(isteğe bağlı)',
+      showMore: 'Daha fazla göster',
+      showLess: 'Daha az göster'
     },
     footer: {
       pitch:
@@ -562,6 +669,109 @@ export const ui = {
       title: 'Bu sayfa şebeke dışına çıktı.',
       lead:
         'Aradığınız sayfa taşınmış ya da hiç var olmamış olabilir. Sizi tekrar enerji dolu bir yere götürelim.'
+    },
+    calculator: {
+      eyebrow: 'Gelir Hesaplayıcı',
+      title: 'Batarya depolama gelirini tahmin edin.',
+      lead:
+        'Hollanda şebeke arbitrajı gelirini tahmin etmek için hızlı bir model. Varsayılanlar önceden dolduruldu — yalnızca bildiğiniz değerleri değiştirin.',
+      inputsTitle: 'Proje girdileri',
+      modeLabel: 'Mod',
+      modeGrid: 'Şebeke Arbitrajı',
+      modeSolar: 'Güneş Eşleşmeli',
+      powerLabel: 'Güç kapasitesi',
+      powerHelp: 'Projenin anma gücü, megavat cinsinden.',
+      durationLabel: 'Süre',
+      durationHelp: 'Anma gücünde depolama süresi. Daha uzun süre daha kademeli döngü sağlar ve verimliliği artırır.',
+      durationUnit: 'saat',
+      advancedToggle: 'Gelişmiş parametreler',
+      advancedNote: 'Hollanda piyasa ve mühendislik varsayılanlarıyla önceden dolduruldu. Geçersiz kılmak için herhangi bir değeri düzenleyin.',
+      groupCore: 'Temel varsayımlar',
+      groupDegradation: 'Bozulma',
+      groupStacking: 'Gelir istifleme',
+      groupSolar: 'Güneş varsayımları',
+      groupLifecycle: 'Yaşam döngüsü ekonomisi',
+      fields: {
+        priceSpread: { label: 'Fiyat farkı', help: 'Hollanda gün öncesi piyasasında ucuz ve pahalı saatler arasındaki ortalama günlük fark. Gelirin en büyük belirleyicisi — yalnızca kendi piyasa verileriniz varsa değiştirin.', unit: '€/MWh' },
+        dod: { label: 'Deşarj derinliği', help: 'Döngü başına anma kapasitesinin kullanılabilir payı.', unit: '%' },
+        cycles: { label: 'Yıllık döngü sayısı', help: 'Yüksek döngü sayıları batarya yıpranmasını artırır. Buradaki bozulma oranı, günde yaklaşık bir döngü varsayar — yoğun çoklu döngü kullanımı bataryayı gösterilenden daha hızlı yıpratır.', unit: 'döngü/yıl' },
+        life: { label: 'Proje ömrü', help: 'Varlığın beklenen işletme ömrü.', unit: 'yıl' },
+        capexPower: { label: 'CAPEX — güç bloğu', help: 'Anma gücünün kW başına güç dönüşüm sistemi maliyeti.', unit: '€/kW' },
+        capexEnergy: { label: 'CAPEX — enerji bloğu', help: 'Anma kapasitesinin kWh başına batarya hücre/enerji maliyeti.', unit: '€/kWh' },
+        opex: { label: 'OPEX', help: 'Toplam CAPEX’in payı olarak yıllık işletme maliyeti.', unit: 'CAPEX’in %’si' },
+        degradationPerCycle: { label: 'Döngü başına bozulma', help: 'Tam bir şarj/deşarj döngüsünde kaybedilen kapasite. Yıllık döngü sayısıyla birlikte, throughput’a dayalı yıpranmayı belirler.', unit: '%/döngü' },
+        calendarDegradation: { label: 'Takvim bozulması', help: 'Döngüden bağımsız olarak yıllık kaybedilen kapasite — batarya hiç kullanılmasa bile oluşan yaşlanma.', unit: '%/yıl' },
+        fcrPrice: { label: 'FCR kapasite fiyatı', help: 'Frekans tutma rezervine ayrılan MW başına yıllık kapasite ödemesi.', unit: '€/MW/yıl' },
+        balancingPrice: { label: 'Dengeleme kapasite fiyatı', help: 'Dengelemeye (aFRR/mFRR) ayrılan MW başına yıllık kapasite ödemesi.', unit: '€/MW/yıl' },
+        specificYield: { label: 'Özgül verim', help: 'Kurulu kWp başına beklenen yıllık güneş üretimi.', unit: 'kWh/kWp/yıl' },
+        summerShare: { label: 'Yaz üretim payı', help: 'Yıllık güneş üretiminin yılın yaz yarısında üretilen payı. Kış geri kalanıdır.', unit: '%' },
+        selfConsumption: { label: 'Öz tüketim oranı', help: 'Güneş üretiminin ihraç edilmek yerine sahada (batarya desteğiyle) tüketilen payı.', unit: '%' },
+        retailImport: { label: 'Perakende ithalat fiyatı', help: 'Bu enerjiyi şebekeden almak için ödeyeceğiniz fiyat — öz tüketilen güneşin değeri.', unit: '€/kWh' },
+        feedInTariff: { label: 'Şebekeye satış tarifesi', help: 'Net ölçüm sona erdiğinde (2027 sonrası) ihraç edilen güneş için ödenen fiyat.', unit: '€/kWh' },
+        discountRate: { label: 'İskonto oranı', help: 'NPV ve LCOS için gelecekteki nakit akışlarını iskonto etmekte kullanılır.', unit: '%' },
+        chargingPrice: { label: 'Şarj fiyatı', help: 'Bataryayı şarj etmek için ödenen varsayılan ortalama fiyat. Referans için yıllık gösterilir; net fiyat farkına karşı iki kez sayılmaması için LCOS’tan ayrı tutulur.', unit: '€/MWh' }
+      },
+      solar: {
+        pvSizeLabel: 'Güneş paneli boyutu',
+        pvSizeHelp: 'Bu bataryayla eşleştirilen kurulu güneş kapasitesi.',
+        consumptionLabel: 'Yıllık saha tüketimi',
+        consumptionHelp: 'İsteğe bağlı — öz tüketimi gerçek saha talebiyle sınırlar. Yok saymak için 0 bırakın.',
+        netMeteringLabel: 'Net ölçüm (2027 öncesi)',
+        netMeteringHelp: 'Açıkken ihraç edilen güneş, bugünkü mahsuplaşma düzenlemesine uygun olarak perakende ithalat fiyatından değerlenir. Kapalıyken, öz tüketimi ana değer belirleyici yapan daha düşük 2027 sonrası şebekeye satış tarifesi uygulanır.'
+      },
+      stacking: {
+        sectionNote: 'FCR veya dengelemeye ayrılan kapasite, arbitrajdan alınan kapasitedir — tahsisler her zaman bataryanın %100’ünü paylaştırır, asla toplamalı olarak istiflenmez.',
+        fcrToggle: 'FCR’a tahsis et',
+        fcrAllocLabel: 'FCR tahsisi',
+        balancingToggle: 'Dengelemeye tahsis et',
+        balancingAllocLabel: 'Dengeleme tahsisi',
+        ineligible: '{h} saatlik sürede uygun değil — nitelik kazanmak için en az {min} saat gerekir.',
+        clampedWarning: 'FCR ve dengeleme tahsisleri toplamda %100’ü aştı ve orantılı olarak aşağı ölçeklendirildi.',
+        allocationTitle: 'Kapasite tahsisi',
+        allocArbitrage: 'Arbitraj',
+        allocFcr: 'FCR',
+        allocBalancing: 'Dengeleme'
+      },
+      lifecycle: {
+        sectionTitle: 'Yaşam döngüsü ekonomisi',
+        lcos: 'Seviyelendirilmiş depolama maliyeti (LCOS)',
+        npv: 'Net bugünkü değer (NPV)',
+        viable: 'Mevcut varsayımlarla yalnızca arbitrajla uygun.',
+        notViable: 'Yalnızca arbitrajla uygun değil — gelir istiflemeyi düşünün.',
+        viabilityNote: 'Deşarj edilen MWh başına yakalanan net fiyat farkını ({spread}) LCOS ({lcos}) ile karşılaştırır.',
+        tableTitle: 'Yıllık nakit akışı',
+        tableNote: 'Yukarıdaki bozulma eğrisini kullanarak proje ömrü boyunca salt okunur projeksiyon.',
+        colYear: 'Yıl',
+        colSoh: 'SoH',
+        colEnergy: 'Deşarj edilen enerji (MWh)',
+        colNet: 'Net nakit akışı',
+        colDiscounted: 'İskontolu net'
+      },
+      solarResults: {
+        sectionTitle: 'Güneş ekonomisi',
+        selfConsumedValue: 'Öz tüketilen değer',
+        exportedValue: 'İhraç edilen değer',
+        seasonalTitle: 'Mevsimsel üretim',
+        summer: 'Yaz',
+        winter: 'Kış'
+      },
+      resultsTitle: 'Tahmini sonuçlar',
+      auto: 'otomatik',
+      notViable: 'Yalnızca arbitrajla uygun değil',
+      results: {
+        nameplate: 'Anma kapasitesi',
+        usable: 'Kullanılabilir kapasite',
+        rte: 'Sistem RTE',
+        capex: 'Toplam CAPEX',
+        capexPerKwh: 'kWh başına CAPEX',
+        grossRevenue: 'Yıllık brüt gelir',
+        netIncome: 'Yıllık net gelir',
+        payback: 'Basit geri ödeme',
+        roi: 'Yatırım getirisi (ROI)'
+      },
+      years: 'yıl',
+      disclaimer:
+        'Yalnızca yukarıdaki varsayımlara dayalı tahminlerdir. Yatırım tavsiyesi değildir — gerçek proje ekonomisi sahaya özgü piyasa, mühendislik ve finansman koşullarına bağlıdır.'
     }
   }
 }
