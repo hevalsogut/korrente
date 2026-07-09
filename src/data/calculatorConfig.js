@@ -43,16 +43,8 @@ export const ADVANCED_DEFAULTS = {
   project_life_years: 15,
   // Power conversion system (PCS) cost per kW | source: IndexBox NL Advanced Battery Market 2026 | https://www.indexbox.io/store/netherlands-advanced-battery-market-analysis-forecast-size-trends-and-insights/ | set: 2026-07 | PCS range €40–70/kW.
   capex_power_eur_kw: 55,
-  // Battery energy (cell+pack+BOS) cost per kWh, NL grid-scale | source: IndexBox NL Advanced Battery Market 2026 | https://www.indexbox.io/store/netherlands-advanced-battery-market-analysis-forecast-size-trends-and-insights/ | set: 2026-07 | NL projects run 15–25% above S. Europe (labor, safety, interconnection). Cell €90–130 + pack markup + BOS €80–120/kWh. Falling ~yearly; confirm against a real supplier quote before launch.
-  // Calibration note: at this CAPEX, the default 2h/365-cycle case's
-  // arbitrage break-even lands at ≈€121 captured spread (price_spread ×
-  // RTE), vs BloombergNEF's ≈€114 benchmark cited above on
-  // price_spread_eur_mwh — a ≈€7 gap driven by this NL CAPEX loading.
-  // Since capex_energy_eur_kwh moves break-even directly, cross-check it
-  // against a second source (e.g. a real NL BESS supplier quote) before
-  // launch — the gap could mean this default is too high, or that the
-  // BloombergNEF figure used a lower-CAPEX assumption than NL requires.
-  capex_energy_eur_kwh: 250,
+  // Battery energy (cell+pack+BOS) all-in cost per kWh, utility-scale | sources: BloombergNEF 2025 Energy Storage Cost Survey ($117/kWh global turnkey, ~$177/kWh Europe) + Ember "How cheap is battery storage" Apr 2026 (~$125/kWh all-in, 4h+, from Saudi/India/Italy auctions) | https://ember-energy.org/latest-insights/how-cheap-is-battery-storage/ | set: 2026-07 | Central European 2026 estimate (~€180–230/kWh); €220 reconciles model break-even with BNEF's ~€114/MWh 2h break-even benchmark. NL projects run ~15–25% above S. Europe — raise toward €250 if a deliberately conservative Dutch-loaded figure is preferred. Falling ~30%/yr; re-check before launch.
+  capex_energy_eur_kwh: 220,
   opex_pct_of_capex: 1.5
 }
 
@@ -119,8 +111,8 @@ export const SOLAR_DEFAULTS = {
   retail_import_eur_kwh: 0.22,
   feed_in_tariff_eur_kwh: 0.03,
   net_metering_2027: true,
-  // PV system installed cost per kWp, utility-scale NL | source: Solar Data Atlas, Europe CAPEX 2026 | https://www.solardataatlas.com/en/data-solar-capex-europe | set: 2026-07 | NL utility-scale range €700–900/kWp (Q1 2026, compiled from IRENA Renewable Cost Database, Fraunhofer ISE, JRC PVGIS/EU PV Status Report); midpoint used. Placeholder — confirm against a real NL EPC quote before launch.
-  solar_capex_eur_per_kwp: 800
+  // Utility-scale ground-mount PV installed cost per kWp | sources: Solar Data Atlas Q1 2026 (IRENA/Fraunhofer ISE, EU utility ~€460–) + SurgePV Jun 2026 (€650–850/kWp EU utility ground-mount) | https://www.solardataatlas.com/en/data-solar-capex-europe | set: 2026-07 | Chosen to match utility-scale battery defaults (100 MW). NOTE: if solar mode is intended for COMMERCIAL ROOFTOP / behind-the-meter instead, NL rooftop is €1,100–1,500/kWp (SurgePV NL page) — use ~€1,200 in that case. Confirm which segment solar mode targets.
+  solar_capex_eur_per_kwp: 650
 }
 
 /* ------------------------------------------------------------------
