@@ -353,14 +353,16 @@ export const ui = {
         npv: 'Net present value (NPV)',
         viable: 'Viable on arbitrage alone at current assumptions.',
         notViable: 'Not viable on arbitrage alone — consider revenue stacking.',
+        scopeNote: 'Arbitrage-only test — excludes FCR, balancing and solar. See NPV for the full revenue picture.',
         viabilityNote: 'Compares the net spread captured per MWh discharged ({spread}) against LCOS ({lcos}).',
         tableTitle: 'Per-year cashflow',
         tableNote: 'Read-only projection over the project life, using the degradation curve above.',
         colYear: 'Year',
         colSoh: 'SoH',
-        colEnergy: 'Energy discharged (MWh)',
-        colNet: 'Net cashflow',
-        colDiscounted: 'Discounted net'
+        colEnergy: 'Energy discharged (battery, MWh)',
+        colArbitrageNet: 'Arbitrage-only net',
+        colNet: 'Net cashflow (total)',
+        colDiscounted: 'Discounted net (total)'
       },
       solarResults: {
         sectionTitle: 'Solar economics',
@@ -738,14 +740,16 @@ export const ui = {
         npv: 'Net bugünkü değer (NPV)',
         viable: 'Mevcut varsayımlarla yalnızca arbitrajla uygun.',
         notViable: 'Yalnızca arbitrajla uygun değil — gelir istiflemeyi düşünün.',
+        scopeNote: 'Yalnızca arbitraj testi — FCR, dengeleme ve güneşi hariç tutar. Tam gelir tablosu için NPV’ye bakın.',
         viabilityNote: 'Deşarj edilen MWh başına yakalanan net fiyat farkını ({spread}) LCOS ({lcos}) ile karşılaştırır.',
         tableTitle: 'Yıllık nakit akışı',
         tableNote: 'Yukarıdaki bozulma eğrisini kullanarak proje ömrü boyunca salt okunur projeksiyon.',
         colYear: 'Yıl',
         colSoh: 'SoH',
-        colEnergy: 'Deşarj edilen enerji (MWh)',
-        colNet: 'Net nakit akışı',
-        colDiscounted: 'İskontolu net'
+        colEnergy: 'Deşarj edilen enerji (batarya, MWh)',
+        colArbitrageNet: 'Yalnızca arbitraj net',
+        colNet: 'Net nakit akışı (toplam)',
+        colDiscounted: 'İskontolu net (toplam)'
       },
       solarResults: {
         sectionTitle: 'Güneş ekonomisi',

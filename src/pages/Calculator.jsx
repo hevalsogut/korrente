@@ -532,6 +532,7 @@ export default function Calculator() {
               <p className={`calc-viability ${results.lifecycle.viableOnArbitrage ? 'calc-viability--ok' : 'calc-viability--warn'}`}>
                 {results.lifecycle.viableOnArbitrage ? t('calculator.lifecycle.viable') : t('calculator.lifecycle.notViable')}
               </p>
+              <p className="calc-field__help">{t('calculator.lifecycle.scopeNote')}</p>
               <p className="calc-field__help">
                 {t('calculator.lifecycle.viabilityNote').replace('{spread}', spreadLabel).replace('{lcos}', lcosLabel)}
               </p>
@@ -545,6 +546,7 @@ export default function Calculator() {
                       <th>{t('calculator.lifecycle.colYear')}</th>
                       <th>{t('calculator.lifecycle.colSoh')}</th>
                       <th>{t('calculator.lifecycle.colEnergy')}</th>
+                      <th>{t('calculator.lifecycle.colArbitrageNet')}</th>
                       <th>{t('calculator.lifecycle.colNet')}</th>
                       <th>{t('calculator.lifecycle.colDiscounted')}</th>
                     </tr>
@@ -555,6 +557,7 @@ export default function Calculator() {
                         <td>{y.year}</td>
                         <td>{fmtNumber(lang, y.soh_pct, 0)}%</td>
                         <td>{fmtNumber(lang, y.energy_discharged_mwh, 0)}</td>
+                        <td>{fmtCurrency(lang, y.arbitrage_net_eur, 0)}</td>
                         <td>{fmtCurrency(lang, y.net_eur, 0)}</td>
                         <td>{fmtCurrency(lang, y.discounted_net_eur, 0)}</td>
                       </tr>

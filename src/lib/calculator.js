@@ -71,9 +71,14 @@ export function calculateRevenue(inputs) {
   const E_nom_mwh = power_mw * duration_h
   const E_use_mwh = E_nom_mwh * (dod_pct / 100)
 
-  const capex_eur = power_mw * 1000 * capex_power_eur_kw + E_nom_mwh * 1000 * capex_energy_eur_kwh
-  const capex_per_kwh = E_nom_mwh > 0 ? capex_eur / (E_nom_mwh * 1000) : 0
-  const opex_eur = capex_eur * (opex_pct_of_capex / 100)
+  // Battery-only CAPEX — kept separate from solar CAPEX (added after the
+  // solar section below) so battery-denominated metrics (CAPEX/kWh,
+  // LCOS) never mix scopes with solar's unrelated MWp/kWp basis. Mixing
+  // a blended cost into a battery-only denominator is exactly the class
+  // of bug the viability-check scope note (see LCOS below) exists to
+  // avoid — CAPEX/kWh and LCOS both stay battery-only for the same reason.
+  const battery_capex_eur = power_mw * 1000 * capex_power_eur_kw + E_nom_mwh * 1000 * capex_energy_eur_kwh
+  const capex_per_kwh = E_nom_mwh > 0 ? battery_capex_eur / (E_nom_mwh * 1000) : 0
 
   // ---- Feature 1: throughput-based degradation ----
   const degradation_per_full_cycle_pct = clampField(
@@ -183,6 +188,27 @@ export function calculateRevenue(inputs) {
     winter_generation_mwh * selfConsumeRatio * 1000 * retail_import_eur_kwh +
     winter_generation_mwh * (1 - selfConsumeRatio) * 1000 * export_price_eur_kwh
 
+  // Solar CAPEX — only in solar mode, and only feeds into TOTAL project
+  // CAPEX (NPV, payback, ROI, the "Total CAPEX" display). Previously
+  // solar revenue was booked against zero PV investment, which is what
+  // inflated NPV to several times CAPEX. Deliberately excluded from
+  // `battery_capex_eur` above, so CAPEX/kWh and LCOS stay battery-only.
+  const solar_capex_eur_per_kwp = clampField(
+    'solar_capex_eur_per_kwp',
+    inputs.solar_capex_eur_per_kwp,
+    SOLAR_DEFAULTS.solar_capex_eur_per_kwp
+  )
+  const solar_capex_eur = mode === 'solar' ? pv_size_mwp * 1000 * solar_capex_eur_per_kwp : 0
+
+  // Total project CAPEX = battery + (solar, if applicable). Grid mode is
+  // unaffected: solar_capex_eur is 0 whenever mode !== 'solar'.
+  const capex_eur = battery_capex_eur + solar_capex_eur
+  const opex_eur = capex_eur * (opex_pct_of_capex / 100)
+  // Battery-only share of OPEX, for the LCOS accumulator below — same
+  // battery-only-scope reasoning as `battery_capex_eur` above. `opex_eur`
+  // (total) still drives annual_net_eur/NPV/payback/ROI.
+  const battery_opex_eur = battery_capex_eur * (opex_pct_of_capex / 100)
+
   const annual_gross_eur = R_arbitrage + R_fcr + R_balancing + R_solar
   const annual_net_eur = annual_gross_eur - opex_eur
   const payback_years = annual_net_eur > 0 ? capex_eur / annual_net_eur : null
@@ -213,11 +239,19 @@ export function calculateRevenue(inputs) {
     const arbitrage_year_eur = energy_discharged_mwh * price_spread_eur_mwh * rte * (alloc_arbitrage_pct / 100)
     const gross_year_eur = arbitrage_year_eur + R_fcr + R_balancing + R_solar
     const net_year_eur = gross_year_eur - opex_eur
+    // Arbitrage-only net (battery-only OPEX, no FCR/balancing/solar) — the
+    // per-year figure that's actually comparable to `energy_discharged_mwh`
+    // (also battery-only). Don't divide `net_year_eur` by this column's
+    // energy figure; see the viability-check scope note near LCOS.
+    const arbitrage_net_year_eur = arbitrage_year_eur - battery_opex_eur
 
     const discount_factor = 1 / Math.pow(1 + r, t)
     const discounted_net_eur = net_year_eur * discount_factor
     const discounted_energy_mwh = energy_discharged_mwh * discount_factor
-    const discounted_opex_eur = opex_eur * discount_factor
+    // Battery-only OPEX discounted for LCOS (see `battery_opex_eur` above)
+    // — not the total `opex_eur`, so solar's OPEX share doesn't leak into
+    // a battery-only-denominated metric.
+    const discounted_battery_opex_eur = battery_opex_eur * discount_factor
 
     // Informational only (see LCOS note below) — the cost to recharge the
     // battery each year, shown per year but not folded into LCOS.
@@ -226,7 +260,7 @@ export function calculateRevenue(inputs) {
 
     npv_eur += discounted_net_eur
     sumDiscountedEnergyMwh += discounted_energy_mwh
-    sumDiscountedOpexEur += discounted_opex_eur
+    sumDiscountedOpexEur += discounted_battery_opex_eur
 
     years.push({
       year: t,
@@ -235,6 +269,7 @@ export function calculateRevenue(inputs) {
       gross_eur: gross_year_eur,
       opex_eur,
       charging_cost_eur,
+      arbitrage_net_eur: arbitrage_net_year_eur,
       net_eur: net_year_eur,
       discounted_net_eur
     })
@@ -252,8 +287,12 @@ export function calculateRevenue(inputs) {
   // Validation note: NL utility-scale LCOS benchmark is €120–180/MWh in
   // 2026 (IndexBox) — computed LCOS should land in this band; outside it
   // signals a bad input (see calculatorConfig.js for sourced defaults).
+  // Uses `battery_capex_eur` (not the total `capex_eur`) — LCOS is a
+  // cost-of-storage metric and must stay scoped to the battery asset
+  // alone, consistent with `sumDiscountedEnergyMwh` (battery-only
+  // throughput) and with `captured_spread_eur_per_mwh` below.
   const lcos_eur_per_mwh =
-    sumDiscountedEnergyMwh > 0 ? (capex_eur + sumDiscountedOpexEur) / sumDiscountedEnergyMwh : null
+    sumDiscountedEnergyMwh > 0 ? (battery_capex_eur + sumDiscountedOpexEur) / sumDiscountedEnergyMwh : null
 
   // €/MWh actually captured per MWh discharged via arbitrage (spread net
   // of round-trip losses) — the figure directly, consistently comparable
@@ -305,7 +344,8 @@ export function calculateRevenue(inputs) {
       winter_generation_mwh,
       summer_value_eur,
       winter_value_eur,
-      net_metering_2027
+      net_metering_2027,
+      capex_eur: solar_capex_eur
     },
 
     lifecycle: {

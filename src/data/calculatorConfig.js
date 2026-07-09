@@ -94,6 +94,14 @@ export const STACKING_DEFAULTS = {
    low feed-in tariff (post-2027), making self-consumption the driver.
    ------------------------------------------------------------------ */
 export const SOLAR_DEFAULTS = {
+  // Defaulting PV to 100 MWp — matching the 100 MW battery default — is
+  // what let solar revenue dominate the model with zero PV CAPEX (see
+  // solar_capex_eur_per_kwp below, which now fixes the CAPEX side).
+  // Sizing PV to the battery's own scale isn't necessarily wrong (some
+  // co-located projects do pair 1:1), but a grid-connection-scale PV farm
+  // paired with a much smaller battery is also common and would call for
+  // a smaller default here. Left as-is (configurable) — flagging for
+  // Heval to confirm which pairing ratio the tool should default to.
   pv_size_mwp: 100,
   annual_consumption_mwh: 0,
   specific_yield_kwh_per_kwp: 900,
@@ -101,7 +109,9 @@ export const SOLAR_DEFAULTS = {
   self_consumption_rate_pct: 75,
   retail_import_eur_kwh: 0.22,
   feed_in_tariff_eur_kwh: 0.03,
-  net_metering_2027: true
+  net_metering_2027: true,
+  // PV system installed cost per kWp, utility-scale NL | source: Solar Data Atlas, Europe CAPEX 2026 | https://www.solardataatlas.com/en/data-solar-capex-europe | set: 2026-07 | NL utility-scale range €700–900/kWp (Q1 2026, compiled from IRENA Renewable Cost Database, Fraunhofer ISE, JRC PVGIS/EU PV Status Report); midpoint used. Placeholder — confirm against a real NL EPC quote before launch.
+  solar_capex_eur_per_kwp: 800
 }
 
 /* ------------------------------------------------------------------
@@ -146,6 +156,7 @@ export const INPUT_LIMITS = {
   self_consumption_rate_pct: { min: 0, max: 100 },
   retail_import_eur_kwh: { min: 0 },
   feed_in_tariff_eur_kwh: { min: 0 },
+  solar_capex_eur_per_kwp: { min: 0 },
 
   discount_rate_pct: { min: 0, max: 30 },
   charging_price_eur_mwh: { min: 0 }
