@@ -44,6 +44,14 @@ export const ADVANCED_DEFAULTS = {
   // Power conversion system (PCS) cost per kW | source: IndexBox NL Advanced Battery Market 2026 | https://www.indexbox.io/store/netherlands-advanced-battery-market-analysis-forecast-size-trends-and-insights/ | set: 2026-07 | PCS range €40–70/kW.
   capex_power_eur_kw: 55,
   // Battery energy (cell+pack+BOS) cost per kWh, NL grid-scale | source: IndexBox NL Advanced Battery Market 2026 | https://www.indexbox.io/store/netherlands-advanced-battery-market-analysis-forecast-size-trends-and-insights/ | set: 2026-07 | NL projects run 15–25% above S. Europe (labor, safety, interconnection). Cell €90–130 + pack markup + BOS €80–120/kWh. Falling ~yearly; confirm against a real supplier quote before launch.
+  // Calibration note: at this CAPEX, the default 2h/365-cycle case's
+  // arbitrage break-even lands at ≈€121 captured spread (price_spread ×
+  // RTE), vs BloombergNEF's ≈€114 benchmark cited above on
+  // price_spread_eur_mwh — a ≈€7 gap driven by this NL CAPEX loading.
+  // Since capex_energy_eur_kwh moves break-even directly, cross-check it
+  // against a second source (e.g. a real NL BESS supplier quote) before
+  // launch — the gap could mean this default is too high, or that the
+  // BloombergNEF figure used a lower-CAPEX assumption than NL requires.
   capex_energy_eur_kwh: 250,
   opex_pct_of_capex: 1.5
 }
@@ -81,7 +89,8 @@ export const STACKING_DEFAULTS = {
   fcr_price_eur_mw_yr: 78000,
   // aFRR capacity revenue per MW per year (capacity only, excl. activation energy) | source: Generation Green (aggregator, NL) | https://generationgreen.energy/nl/batterijen/fcr-afrr-mfrr/ | set: 2026-07 | ≈ €1,800–2,800/MW/month, midpoint €2,300 × 12. Declining. Official: https://www.tennet.eu/nl-en/markets/dutch-market/balancing-markets
   balancing_price_eur_mw_yr: 27600,
-  fcr_min_duration_h: 1,
+  // FCR minimum energy-to-power ratio | source: TenneT FCR Manual for BSPs | https://www.tennet.eu/electricity-market/dutch-ancillary-services/fcr-documents | set: 2026-07 | TenneT requires FCR providers to sustain full contracted power for a sufficient duration (commonly cited as a ≥1.25 MWh/MW ratio); a 1.0 MWh/MW (1h) battery does not meet this, a 2.0 MWh/MW (2h) battery does. Compared directly against duration_h since Tier 1 only offers discrete 1/2/4h options — confirm the exact ratio against TenneT's current FCR product spec before launch.
+  fcr_min_duration_h: 1.25,
   balancing_min_duration_h: 2
 }
 
