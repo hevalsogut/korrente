@@ -5,18 +5,25 @@ import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import { services as staticServices } from '../data/services.js'
-import { fetchSolutions } from '../lib/strapi.js'
+import { fetchSolutions, fetchSolutionsPage, SOLUTIONS_PAGE_FALLBACK } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Solutions.css'
 
 export default function Solutions() {
   const { t, pick, lang } = useI18n()
   const [services, setServices] = useState(staticServices)
+  const [hero, setHero] = useState(SOLUTIONS_PAGE_FALLBACK)
 
   useEffect(() => {
     fetchSolutions()
       .then(setServices)
       .catch((err) => console.warn('Falling back to static solutions:', err))
+  }, [])
+
+  useEffect(() => {
+    fetchSolutionsPage()
+      .then(setHero)
+      .catch((err) => console.warn('Falling back to static solutions page hero:', err))
   }, [])
 
   const seo = {
@@ -38,10 +45,10 @@ export default function Solutions() {
     <>
       <Seo title={seo.title} description={seo.description} path="/solutions" />
 
-      <PageHero eyebrow={t('solutions.eyebrow')} title={t('solutions.title')} lead={t('solutions.lead')} />
+      <PageHero eyebrow={pick(hero.eyebrow)} title={pick(hero.heading)} lead={pick(hero.subhead)} />
 
       {/* Anchor nav */}
-      <nav className="solutions-nav surface-dark" aria-label={t('solutions.eyebrow')}>
+      <nav className="solutions-nav surface-dark" aria-label={pick(hero.eyebrow)}>
         <div className="container solutions-nav__inner">
           {services.map((s) => (
             <a key={s.id} href={`#${s.id}`} className="solutions-nav__link">

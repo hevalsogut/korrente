@@ -132,3 +132,33 @@ export async function fetchSolutions() {
     return services
   }
 }
+
+/* Solutions page hero — a Strapi single type, so `data` is one object,
+   not an array. Fallback matches the copy previously hardcoded in
+   src/i18n/ui.js under `solutions.eyebrow` / `.title` / `.lead`. */
+export const SOLUTIONS_PAGE_FALLBACK = {
+  eyebrow: { en: 'Solutions', tr: 'Çözümler' },
+  heading: { en: 'Every layer of dependable clean energy.', tr: 'Güvenilir temiz enerjinin her katmanı.' },
+  subhead: {
+    en: 'We develop, build, and operate across the full clean energy stack — and tie it together with software that makes renewables behave like firm, plannable power.',
+    tr: 'Temiz enerji yığınının tamamında geliştirir, kurar ve işletiriz — ve hepsini, yenilenebilir enerjiyi kesintisiz ve planlanabilir bir güç gibi davranmaya iten yazılımla birbirine bağlarız.'
+  }
+}
+
+function mapSolutionsPage(item) {
+  return {
+    eyebrow: { en: item.eyebrowEn, tr: item.eyebrowTr },
+    heading: { en: item.headingEn, tr: item.headingTr },
+    subhead: { en: item.subheadEn, tr: item.subheadTr }
+  }
+}
+
+export async function fetchSolutionsPage() {
+  try {
+    const json = await fetchJson('solutions-page?populate=*')
+    return json.data ? mapSolutionsPage(json.data) : SOLUTIONS_PAGE_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static solutions page hero:', err)
+    return SOLUTIONS_PAGE_FALLBACK
+  }
+}
