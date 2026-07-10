@@ -63,7 +63,15 @@ export default function Solutions() {
             <div className="container solution-detail__grid">
               <Reveal className="solution-detail__media">
                 <div className="solution-detail__visual">
-                  <Icon name={service.icon} size={64} strokeWidth={1.2} />
+                  {service.image ? (
+                    <img
+                      src={service.image}
+                      alt={pick(service.name)}
+                      className="solution-detail__image"
+                    />
+                  ) : (
+                    <Icon name={service.icon} size={64} strokeWidth={1.2} />
+                  )}
                   {service.metric && (
                     <div className="solution-detail__metric">
                       <span className="solution-detail__metric-value">

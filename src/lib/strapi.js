@@ -10,11 +10,20 @@
 import { services } from '../data/services.js'
 
 const BASE = import.meta.env.VITE_STRAPI_URL
+// Strapi's own origin, for resolving media URLs — Strapi returns relative
+// paths like "/uploads/xyz.png" for local-provider uploads, but an already-
+// absolute URL (e.g. a cloud storage provider) if one is configured.
+const ORIGIN = BASE?.replace(/\/api\/?$/, '')
 
 async function fetchJson(path) {
   const res = await fetch(`${BASE}/api/${path}`)
   if (!res.ok) throw new Error(`Strapi request failed: ${res.status} ${res.statusText}`)
   return res.json()
+}
+
+function toAbsoluteMediaUrl(url) {
+  if (!url) return null
+  return /^https?:\/\//.test(url) ? url : `${ORIGIN}${url}`
 }
 
 function mapArticle(item) {
@@ -95,7 +104,7 @@ export async function fetchRoleBySlug(slug) {
    icon), so Solutions.jsx / Home.jsx / ServiceCard.jsx need no changes
    beyond swapping their data source. */
 function mapSolution(item) {
-  const features = item.features || []
+  const features = item.feature || []
   return {
     id: item.documentId,
     icon: item.iconKey,
@@ -109,7 +118,7 @@ function mapSolution(item) {
     metric: item.statValue
       ? { value: item.statValue, unit: item.statUnit, label: { en: item.statLabelEn, tr: item.statLabelTr } }
       : null,
-    image: item.image?.url ? `${BASE}${item.image.url}` : null
+    image: toAbsoluteMediaUrl(item.image?.url)
   }
 }
 
