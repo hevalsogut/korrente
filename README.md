@@ -78,9 +78,11 @@ korrente/
 │   ├── data/                 # ⭐ EDITABLE CONTENT (bilingual: { en, tr })
 │   │   ├── site.js           #   company details, nav, socials, footer, legal
 │   │   ├── services.js       #   the six solutions/services
-│   │   └── content.js        #   values, stats, testimonials, timeline, team,
+│   │   ├── calculatorConfig.js # Revenue calculator defaults
+│   │   └── content.js        #   values, stats, testimonials, team,
 │   │                         #   commitments, articles, projects, roles (fallback data)
 │   ├── lib/
+│   │   ├── calculator.js     #   Revenue calculator pure math functions
 │   │   └── strapi.js         #   Strapi fetch helpers (articles, projects, roles)
 │   ├── components/           # reusable UI (Header, Footer, Button, Reveal,
 │   │                         #   Counter, Icon, HeroScene, LanguageSwitcher…)
@@ -97,6 +99,7 @@ korrente/
 │       ├── CareerDetail.jsx / .css
 │       ├── Sustainability.jsx / .css
 │       ├── Contact.jsx / .css
+│       ├── Calculator.jsx / .css
 │       └── NotFound.jsx / .css
 └── README.md
 ```
@@ -145,7 +148,8 @@ keys). Interface strings in `ui.js` are grouped as `en: { … }` and `tr: { … 
 | "Why Korrente" value props | `src/data/content.js` → `values` |
 | Impact stat counters (numbers + labels) | `src/data/content.js` → `stats` |
 | Testimonials | `src/data/content.js` → `testimonials` |
-| About-page timeline & leadership team | `src/data/content.js` → `timeline`, `team` |
+| About-page leadership team | `src/data/content.js` → `team` |
+| Revenue Calculator defaults (prices, CAPEX, limits) | `src/data/calculatorConfig.js` |
 | Sustainability commitments | `src/data/content.js` → `commitments` |
 | Insights / news articles | `src/data/content.js` → `articles` |
 | Hero headline, buttons, nav, all UI labels, form errors | `src/i18n/ui.js` |
