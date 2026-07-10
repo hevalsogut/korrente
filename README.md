@@ -23,7 +23,6 @@ cp .env.example .env  # set up environment variables for CMS
 npm run dev           # start the dev server at http://localhost:5173
 ```
 
-Then open <http://localhost:5173> (it opens automatically).
 
 ### Build & preview a production bundle
 
