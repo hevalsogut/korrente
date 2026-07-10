@@ -129,6 +129,58 @@ working static site offline.
 
 ---
 
+## Revenue Calculator
+
+At `/calculator`, a battery-storage revenue and lifetime-economics model that
+recalculates instantly as you type — entirely client-side, no backend or API
+calls.
+
+**Two modes** (`CALCULATOR_MODES` in `calculatorConfig.js`):
+
+- **Grid arbitrage** — the battery buys low / sells high on the price spread,
+  optionally stacking FCR and/or balancing-market revenue on top.
+- **Solar + storage** — adds a co-located PV array, splitting its generation
+  between self-consumption (avoided retail import) and export (feed-in
+  tariff, or retail-parity pricing if net metering applies).
+
+**Inputs are tiered.** Power, duration (1/2/4 h — each maps to a fixed
+round-trip efficiency), and, in solar mode, PV size and annual consumption are
+front and centre. An "Advanced parameters" panel exposes everything else:
+CAPEX (split power-based €/kW + energy-based €/kWh), OPEX % of CAPEX, depth of
+discharge, cycles/year, project life, degradation (per-cycle + calendar),
+FCR/balancing prices and allocation %, solar specifics (yield, seasonal split,
+self-consumption rate, tariffs), discount rate, and charging price.
+
+**FCR/balancing stacking is zero-sum** — allocating capacity % to an ancillary
+service takes it from arbitrage — and each service only becomes available
+once the selected duration clears its own minimum-duration threshold; the
+toggle is disabled with an explanation when a duration doesn't qualify.
+
+**Results** cover nameplate/usable energy, CAPEX and €/kWh, gross/net annual
+revenue, payback period, and ROI%, plus a capacity-allocation breakdown
+(arbitrage vs. FCR vs. balancing) and a full lifetime table — year-by-year
+state-of-health, discharged energy, and discounted net cash flow feeding into
+LCOS and NPV. Solar mode adds a self-consumed-vs-exported value split and a
+summer/winter generation bar.
+
+| File | Role |
+| --- | --- |
+| `src/pages/Calculator.jsx` | Form state, layout, and result formatting (bilingual, `Intl.NumberFormat` currency/number output) |
+| `src/lib/calculator.js` | `calculateRevenue(inputs)` — the whole model as one pure, dependency-free function; every field is coerced and clamped, so it's safe to call directly with raw form-state strings |
+| `src/data/calculatorConfig.js` | Defaults, input min/max limits, and the RTE-by-duration table — tune assumptions here without touching the math |
+
+Because `calculateRevenue` has no React/i18n/side effects, it's straightforward
+to unit-test with plain input/output objects. Read the inline comments in
+`calculator.js` before changing the math — they document scope rules (e.g.
+battery-only vs. total-project CAPEX, what LCOS is and isn't allowed to
+include) that are easy to accidentally break.
+
+The pre-filled defaults are sourced, placeholder Netherlands market/engineering
+assumptions (see the sourcing comments in `calculatorConfig.js`) — the on-page
+disclaimer notes this is an illustrative model, not investment advice.
+
+---
+
 ## Editing content (for non-developers)
 
 Copy lives in two places: **`src/data/`** (page content) and **`src/i18n/ui.js`**
