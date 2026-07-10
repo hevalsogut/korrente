@@ -97,6 +97,17 @@ export default function ArticleDetail() {
               {t('news.backToNews')}
             </Link>
           </Reveal>
+          {article.coverUrl && (
+            <Reveal delay={40} className="article-detail__media">
+              <img
+                src={article.coverUrl}
+                alt={pick(article.title)}
+                width={960}
+                height={540}
+                className="article-detail__image"
+              />
+            </Reveal>
+          )}
           <Reveal delay={80} className="article-detail__body">
             {paragraphs.map((p, i) => (
               <p key={i}>{p}</p>

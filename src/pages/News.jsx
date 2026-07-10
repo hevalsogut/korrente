@@ -67,9 +67,19 @@ export default function News() {
         <div className="container">
           <Reveal>
             <article className="feature-article">
-              <div className="feature-article__media" aria-hidden="true">
+              <div className="feature-article__media">
                 <span className="feature-article__badge">{t('news.featured')}</span>
-                <Icon name="spark" size={72} strokeWidth={1} />
+                {featured.coverUrl ? (
+                  <img
+                    src={featured.coverUrl}
+                    alt={pick(featured.title)}
+                    width={640}
+                    height={440}
+                    className="feature-article__image"
+                  />
+                ) : (
+                  <Icon name="spark" size={72} strokeWidth={1} aria-hidden="true" />
+                )}
               </div>
               <div className="feature-article__body">
                 <div className="article-meta">
@@ -113,6 +123,17 @@ export default function News() {
           <div className="news-grid">
             {visible.map((article, i) => (
               <Reveal as="article" className="news-card" key={article.id} delay={(i % 3) * 80}>
+                {article.coverUrl && (
+                  <div className="news-card__media">
+                    <img
+                      src={article.coverUrl}
+                      alt={pick(article.title)}
+                      width={400}
+                      height={240}
+                      className="news-card__image"
+                    />
+                  </div>
+                )}
                 <div className="news-card__top" aria-hidden="true">
                   <Icon name="arrowUpRight" size={20} />
                 </div>

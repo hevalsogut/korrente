@@ -24,17 +24,18 @@ function mapArticle(item) {
     readingTime: { en: item.readingTimeEn, tr: item.readingTimeTr },
     body: { en: item.bodyEn, tr: item.bodyTr },
     date: item.date,
-    featured: item.featured
+    featured: item.featured,
+    coverUrl: item.image?.url ? `${BASE}${item.image.url}` : null
   }
 }
 
 export async function fetchArticles() {
-  const json = await fetchJson('articles?sort=date:desc')
+  const json = await fetchJson('articles?sort=date:desc&populate=image')
   return json.data.map(mapArticle)
 }
 
 export async function fetchArticleBySlug(slug) {
-  const json = await fetchJson(`articles?filters[slug][$eq]=${encodeURIComponent(slug)}`)
+  const json = await fetchJson(`articles?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=image`)
   const item = json.data[0]
   return item ? mapArticle(item) : null
 }

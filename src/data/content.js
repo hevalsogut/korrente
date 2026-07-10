@@ -127,7 +127,8 @@ export const articles = [
     featured: true,
     title: { en: 'Why firm renewables — not just more renewables — will decide the transition', tr: 'Dönüşümü neden daha fazla yenilenebilir değil, kesintisiz yenilenebilir belirleyecek' },
     excerpt: { en: 'Nameplate capacity is the easy part. The real work is making clean power dependable at 6 p.m. in January. Here is how storage and intelligent dispatch change the equation.', tr: 'Anma kapasitesi kolay kısım. Asıl iş, temiz enerjiyi ocak ayında saat 18.00’de güvenilir kılmak. Depolama ve akıllı sevkiyatın denklemi nasıl değiştirdiğini anlatıyoruz.' },
-    body: { en: 'Nameplate capacity is the easy part. The real work is making clean power dependable at 6 p.m. in January. Here is how storage and intelligent dispatch change the equation.', tr: 'Anma kapasitesi kolay kısım. Asıl iş, temiz enerjiyi ocak ayında saat 18.00’de güvenilir kılmak. Depolama ve akıllı sevkiyatın denklemi nasıl değiştirdiğini anlatıyoruz.' }
+    body: { en: 'Nameplate capacity is the easy part. The real work is making clean power dependable at 6 p.m. in January. Here is how storage and intelligent dispatch change the equation.', tr: 'Anma kapasitesi kolay kısım. Asıl iş, temiz enerjiyi ocak ayında saat 18.00’de güvenilir kılmak. Depolama ve akıllı sevkiyatın denklemi nasıl değiştirdiğini anlatıyoruz.' },
+    coverUrl: null
   },
   {
     id: 'a2',
@@ -137,7 +138,8 @@ export const articles = [
     readingTime: { en: '4 min', tr: '4 dk' },
     title: { en: 'Inside our largest battery: 900 MWh and what it took to build', tr: 'En büyük bataryamızın içinde: 900 MWh ve inşası için gerekenler' },
     excerpt: { en: 'A field report from commissioning the Solano storage hub, from cell chemistry choices to the software that keeps it responsive to the grid.', tr: 'Solano depolama merkezinin devreye alınmasından bir saha raporu; hücre kimyası seçimlerinden onu şebekeye duyarlı tutan yazılıma kadar.' },
-    body: { en: 'A field report from commissioning the Solano storage hub, from cell chemistry choices to the software that keeps it responsive to the grid.', tr: 'Solano depolama merkezinin devreye alınmasından bir saha raporu; hücre kimyası seçimlerinden onu şebekeye duyarlı tutan yazılıma kadar.' }
+    body: { en: 'A field report from commissioning the Solano storage hub, from cell chemistry choices to the software that keeps it responsive to the grid.', tr: 'Solano depolama merkezinin devreye alınmasından bir saha raporu; hücre kimyası seçimlerinden onu şebekeye duyarlı tutan yazılıma kadar.' },
+    coverUrl: null
   },
   {
     id: 'a3',
@@ -147,7 +149,8 @@ export const articles = [
     readingTime: { en: '5 min', tr: '5 dk' },
     title: { en: 'Interconnection reform is the unglamorous fix the grid needs most', tr: 'Şebeke bağlantısı reformu, şebekenin en çok ihtiyaç duyduğu göz alıcı olmayan çözüm' },
     excerpt: { en: 'Thousands of clean projects are stuck in queues. We break down the process bottlenecks and the reforms that would actually move gigawatts.', tr: 'Binlerce temiz proje kuyruklarda takılı kalmış durumda. Süreçteki darboğazları ve gerçekten gigavatları harekete geçirecek reformları açıklıyoruz.' },
-    body: { en: 'Thousands of clean projects are stuck in queues. We break down the process bottlenecks and the reforms that would actually move gigawatts.', tr: 'Binlerce temiz proje kuyruklarda takılı kalmış durumda. Süreçteki darboğazları ve gerçekten gigavatları harekete geçirecek reformları açıklıyoruz.' }
+    body: { en: 'Thousands of clean projects are stuck in queues. We break down the process bottlenecks and the reforms that would actually move gigawatts.', tr: 'Binlerce temiz proje kuyruklarda takılı kalmış durumda. Süreçteki darboğazları ve gerçekten gigavatları harekete geçirecek reformları açıklıyoruz.' },
+    coverUrl: null
   },
   {
     id: 'a4',
@@ -157,7 +160,8 @@ export const articles = [
     readingTime: { en: '3 min', tr: '3 dk' },
     title: { en: 'What a good community benefit agreement actually looks like', tr: 'İyi bir topluluk fayda anlaşması gerçekte nasıl görünür' },
     excerpt: { en: 'Shared ownership, local hiring, and long-term funds — the ingredients that turn a project’s neighbours into its partners.', tr: 'Ortak sahiplik, yerel istihdam ve uzun vadeli fonlar — bir projenin komşularını ortaklarına dönüştüren bileşenler.' },
-    body: { en: 'Shared ownership, local hiring, and long-term funds — the ingredients that turn a project’s neighbours into its partners.', tr: 'Ortak sahiplik, yerel istihdam ve uzun vadeli fonlar — bir projenin komşularını ortaklarına dönüştüren bileşenler.' }
+    body: { en: 'Shared ownership, local hiring, and long-term funds — the ingredients that turn a project’s neighbours into its partners.', tr: 'Ortak sahiplik, yerel istihdam ve uzun vadeli fonlar — bir projenin komşularını ortaklarına dönüştüren bileşenler.' },
+    coverUrl: null
   },
   {
     id: 'a5',
@@ -167,7 +171,8 @@ export const articles = [
     readingTime: { en: '7 min', tr: '7 dk' },
     title: { en: 'Forecasting the sky: how we predict generation to the sub-hour', tr: 'Gökyüzünü tahminlemek: üretimi saat altı düzeyde nasıl öngörüyoruz' },
     excerpt: { en: 'A look under the hood of Korrente Grid’s forecasting models and why small accuracy gains compound into large revenue and reliability wins.', tr: 'Korrente Grid’in tahmin modellerinin kaputunun altına bir bakış ve küçük doğruluk kazanımlarının neden büyük gelir ve güvenilirlik kazançlarına dönüştüğü.' },
-    body: { en: 'A look under the hood of Korrente Grid’s forecasting models and why small accuracy gains compound into large revenue and reliability wins.', tr: 'Korrente Grid’in tahmin modellerinin kaputunun altına bir bakış ve küçük doğruluk kazanımlarının neden büyük gelir ve güvenilirlik kazançlarına dönüştüğü.' }
+    body: { en: 'A look under the hood of Korrente Grid’s forecasting models and why small accuracy gains compound into large revenue and reliability wins.', tr: 'Korrente Grid’in tahmin modellerinin kaputunun altına bir bakış ve küçük doğruluk kazanımlarının neden büyük gelir ve güvenilirlik kazançlarına dönüştüğü.' },
+    coverUrl: null
   },
   {
     id: 'a6',
@@ -177,6 +182,7 @@ export const articles = [
     readingTime: { en: '5 min', tr: '5 dk' },
     title: { en: 'Green hydrogen’s honest use cases — and the hype to ignore', tr: 'Yeşil hidrojenin dürüst kullanım alanları — ve göz ardı edilecek abartı' },
     excerpt: { en: 'Hydrogen is not a silver bullet, but for a handful of hard-to-abate sectors it is essential. We map where the molecule genuinely wins.', tr: 'Hidrojen sihirli bir değnek değil, ancak azaltılması zor birkaç sektör için vazgeçilmez. Molekülün gerçekten kazandığı yerleri haritalıyoruz.' },
-    body: { en: 'Hydrogen is not a silver bullet, but for a handful of hard-to-abate sectors it is essential. We map where the molecule genuinely wins.', tr: 'Hidrojen sihirli bir değnek değil, ancak azaltılması zor birkaç sektör için vazgeçilmez. Molekülün gerçekten kazandığı yerleri haritalıyoruz.' }
+    body: { en: 'Hydrogen is not a silver bullet, but for a handful of hard-to-abate sectors it is essential. We map where the molecule genuinely wins.', tr: 'Hidrojen sihirli bir değnek değil, ancak azaltılması zor birkaç sektör için vazgeçilmez. Molekülün gerçekten kazandığı yerleri haritalıyoruz.' },
+    coverUrl: null
   }
 ]
