@@ -100,15 +100,6 @@ export const testimonials = [
   }
 ]
 
-/* Company timeline for the About page */
-export const timeline = [
-  { year: '2011', title: { en: 'Founded in Oakland', tr: 'Oakland’da kuruldu' }, body: { en: 'Korrente starts with a single 12 MW solar project and a conviction that clean energy has to be dependable to matter.', tr: 'Korrente, tek bir 12 MW’lık güneş projesi ve temiz enerjinin önemli olması için güvenilir olması gerektiği inancıyla başlar.' } },
-  { year: '2015', title: { en: 'First gigawatt', tr: 'İlk gigavat' }, body: { en: 'We cross 1 GW of operating capacity and open our grid-operations centre.', tr: '1 GW işletme kapasitesini aşar ve şebeke operasyon merkezimizi açarız.' } },
-  { year: '2019', title: { en: 'Storage at scale', tr: 'Ölçekte depolama' }, body: { en: 'Our first co-located solar-plus-storage plant proves firm renewable power is commercially ready.', tr: 'İlk ortak konumlu güneş-artı-depolama santralimiz, kesintisiz yenilenebilir gücün ticari olarak hazır olduğunu kanıtlar.' } },
-  { year: '2022', title: { en: 'Korrente Grid launches', tr: 'Korrente Grid başlar' }, body: { en: 'The fleet-wide intelligence platform goes live, automating forecasting and dispatch across every asset.', tr: 'Filo genelindeki zekâ platformu devreye girer; her varlıkta tahmin ve sevkiyatı otomatikleştirir.' } },
-  { year: '2026', title: { en: '7.3 GW and counting', tr: '7,3 GW ve artıyor' }, body: { en: 'Today we operate a diversified clean-energy fleet across three continents — and we are just getting started.', tr: 'Bugün üç kıtada çeşitlendirilmiş bir temiz enerji filosu işletiyoruz — ve daha yeni başlıyoruz.' } }
-]
-
 /* Leadership for the About page */
 export const team = [
   { id: 'l1', displayName: 'Elena Marković', initials: 'EM', role: { en: 'Chief Executive Officer', tr: 'İcra Kurulu Başkanı' } },

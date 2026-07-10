@@ -5,8 +5,7 @@ import SectionHeading from '../components/SectionHeading.jsx'
 import StatsBand from '../components/StatsBand.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import Icon from '../components/Icon.jsx'
-import { timeline, team, values } from '../data/content.js'
-import { company } from '../data/site.js'
+import { team, values } from '../data/content.js'
 import { useI18n } from '../i18n/index.jsx'
 import './About.css'
 
@@ -19,12 +18,12 @@ export default function About() {
     en: {
       title: 'About',
       description:
-        'Korrente is an owner-operator of clean energy infrastructure. Meet the team, the story, and the principles behind a decade of dependable renewable power.'
+        'Korrente is a battery energy storage (BESS) company. Meet the team and the principles behind dependable, grid-ready energy storage.'
     },
     tr: {
       title: 'Hakkımızda',
       description:
-        'Korrente, temiz enerji altyapısının sahip-işletmecisidir. On yıllık güvenilir yenilenebilir enerjinin arkasındaki ekiple, hikâyeyle ve ilkelerle tanışın.'
+        'Korrente, bir batarya enerji depolama (BESS) şirketidir. Güvenilir, şebekeye hazır enerji depolamanın arkasındaki ekiple ve ilkelerle tanışın.'
     }
   }[lang]
 
@@ -37,7 +36,7 @@ export default function About() {
       <PageHero
         eyebrow={t('about.eyebrow')}
         title={t('about.title')}
-        lead={t('about.lead').replace('{year}', company.foundedYear)}
+        lead={t('about.lead')}
       />
 
       {/* Mission split */}
@@ -72,31 +71,6 @@ export default function About() {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Timeline */}
-      <section className="surface-dark section">
-        <div className="container">
-          <SectionHeading
-            eyebrow={t('about.storyEyebrow')}
-            title={t('about.storyTitle')}
-            lead={t('about.storyLead')}
-          />
-          <ol className="timeline" role="list">
-            {timeline.map((item, i) => (
-              <Reveal as="li" className="timeline__item" key={item.year} delay={i * 70}>
-                <div className="timeline__marker" aria-hidden="true">
-                  <span className="timeline__dot" />
-                </div>
-                <div className="timeline__content">
-                  <span className="timeline__year">{item.year}</span>
-                  <h3 className="timeline__title h4">{pick(item.title)}</h3>
-                  <p className="text-muted">{pick(item.body)}</p>
-                </div>
-              </Reveal>
-            ))}
-          </ol>
         </div>
       </section>
 

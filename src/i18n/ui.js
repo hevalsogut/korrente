@@ -91,7 +91,7 @@ export const ui = {
       eyebrow: 'About Korrente',
       title: 'A clean energy company built for the long term.',
       lead:
-        'Since {year}, we’ve developed and operated renewable power with one goal: to make clean energy something the grid — and the communities it serves — can truly rely on.',
+        'We develop and operate battery energy storage with one goal: to make clean energy something the grid — and the communities it serves — can truly rely on.',
       missionEyebrow: 'Our mission',
       missionPre: 'To build the clean, dependable energy backbone of a',
       missionAccent: ' low-carbon economy',
@@ -105,11 +105,8 @@ export const ui = {
         { title: 'Genuinely sustainable', body: 'Not just low-carbon generation, but circular materials, restored land, and honest, audited accounting.' },
         { title: 'Engineering rigour', body: 'Measured data over marketing. We underwrite every project conservatively and prove our numbers.' }
       ],
-      storyEyebrow: 'Our story',
-      storyTitle: 'From one project to a global fleet.',
-      storyLead: 'A decade and a half of building clean energy that has to work — and does.',
       statsEyebrow: 'By the numbers',
-      statsHeading: 'Fifteen years of measurable impact.',
+      statsHeading: 'Our impact, measured.',
       valuesEyebrow: 'How we work',
       valuesTitle: 'Principles we don’t compromise on.',
       leadershipEyebrow: 'Leadership',
@@ -477,7 +474,7 @@ export const ui = {
       eyebrow: 'Korrente Hakkında',
       title: 'Uzun vade için kurulmuş bir temiz enerji şirketi.',
       lead:
-        '{year} yılından bu yana yenilenebilir enerji geliştirip işletiyoruz; tek bir hedefle: temiz enerjiyi hem şebekenin hem de hizmet verdiği toplulukların gerçekten güvenebileceği bir şeye dönüştürmek.',
+        'Batarya enerji depolama geliştirir ve işletiriz; tek bir hedefle: temiz enerjiyi hem şebekenin hem de hizmet verdiği toplulukların gerçekten güvenebileceği bir şeye dönüştürmek.',
       missionEyebrow: 'Misyonumuz',
       missionPre: 'Bir',
       missionAccent: ' düşük karbonlu ekonominin',
@@ -492,11 +489,8 @@ export const ui = {
         { title: 'Gerçekten sürdürülebilir', body: 'Yalnızca düşük karbonlu üretim değil; döngüsel malzemeler, iyileştirilmiş araziler ve dürüst, denetlenmiş muhasebe.' },
         { title: 'Mühendislik titizliği', body: 'Pazarlama yerine ölçülmüş veri. Her projeyi ihtiyatlı bir şekilde taahhüt eder ve sayılarımızı kanıtlarız.' }
       ],
-      storyEyebrow: 'Hikâyemiz',
-      storyTitle: 'Tek bir projeden küresel bir filoya.',
-      storyLead: 'On beş yıldır çalışmak zorunda olan temiz enerji inşa ediyoruz — ve çalışıyor.',
       statsEyebrow: 'Rakamlarla',
-      statsHeading: 'On beş yıllık ölçülebilir etki.',
+      statsHeading: 'Etkimiz, rakamlarla.',
       valuesEyebrow: 'Nasıl çalışırız',
       valuesTitle: 'Ödün vermediğimiz ilkeler.',
       leadershipEyebrow: 'Liderlik',
