@@ -133,23 +133,66 @@ export async function fetchSolutions() {
   }
 }
 
-/* Solutions page hero — a Strapi single type, so `data` is one object,
-   not an array. Fallback matches the copy previously hardcoded in
-   src/i18n/ui.js under `solutions.eyebrow` / `.title` / `.lead`. */
+/* Solutions page hero + "how we deliver" section — a Strapi single
+   type, so `data` is one object, not an array. Fallback matches the
+   copy previously hardcoded in src/i18n/ui.js under `solutions.eyebrow`
+   / `.title` / `.lead` / `.processEyebrow` / `.processTitle` / `.process`. */
 export const SOLUTIONS_PAGE_FALLBACK = {
   eyebrow: { en: 'Solutions', tr: 'Çözümler' },
   heading: { en: 'Every layer of dependable clean energy.', tr: 'Güvenilir temiz enerjinin her katmanı.' },
   subhead: {
     en: 'We develop, build, and operate across the full clean energy stack — and tie it together with software that makes renewables behave like firm, plannable power.',
     tr: 'Temiz enerji yığınının tamamında geliştirir, kurar ve işletiriz — ve hepsini, yenilenebilir enerjiyi kesintisiz ve planlanabilir bir güç gibi davranmaya iten yazılımla birbirine bağlarız.'
-  }
+  },
+  deliveryEyebrow: { en: 'How we deliver', tr: 'Nasıl teslim ederiz' },
+  deliveryHeading: {
+    en: 'From origination to decades of operation.',
+    tr: 'Kaynak bulmadan onlarca yıllık işletmeye.'
+  },
+  steps: [
+    {
+      title: { en: 'Originate', tr: 'Kaynak bul' },
+      description: {
+        en: 'Site, resource, and interconnection analysis to find projects that genuinely pencil out.',
+        tr: 'Gerçekten fizibil projeler bulmak için saha, kaynak ve şebeke bağlantısı analizi.'
+      }
+    },
+    {
+      title: { en: 'Develop', tr: 'Geliştir' },
+      description: {
+        en: 'Permitting, community engagement, and engineering to make a project buildable and bankable.',
+        tr: 'Bir projeyi inşa edilebilir ve finanse edilebilir kılmak için izinler, topluluk katılımı ve mühendislik.'
+      }
+    },
+    {
+      title: { en: 'Build', tr: 'İnşa et' },
+      description: {
+        en: 'Disciplined EPC oversight that delivers on schedule, on budget, and to spec.',
+        tr: 'Zamanında, bütçesinde ve şartnamesine uygun teslim eden disiplinli EPC gözetimi.'
+      }
+    },
+    {
+      title: { en: 'Operate', tr: 'İşlet' },
+      description: {
+        en: 'Decades of asset management and optimisation through our grid-intelligence platform.',
+        tr: 'Şebeke zekâsı platformumuz aracılığıyla onlarca yıllık varlık yönetimi ve optimizasyon.'
+      }
+    }
+  ]
 }
 
 function mapSolutionsPage(item) {
+  const steps = item.steps || []
   return {
     eyebrow: { en: item.eyebrowEn, tr: item.eyebrowTr },
     heading: { en: item.headingEn, tr: item.headingTr },
-    subhead: { en: item.subheadEn, tr: item.subheadTr }
+    subhead: { en: item.subheadEn, tr: item.subheadTr },
+    deliveryEyebrow: { en: item.deliveryEyebrowEn, tr: item.deliveryEyebrowTr },
+    deliveryHeading: { en: item.deliveryHeadingEn, tr: item.deliveryHeadingTr },
+    steps: steps.map((s) => ({
+      title: { en: s.titleEn, tr: s.titleTr },
+      description: { en: s.descriptionEn, tr: s.descriptionTr }
+    }))
   }
 }
 

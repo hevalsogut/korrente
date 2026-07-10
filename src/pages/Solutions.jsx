@@ -39,8 +39,6 @@ export default function Solutions() {
     }
   }[lang]
 
-  const process = t('solutions.process')
-
   return (
     <>
       <Seo title={seo.title} description={seo.description} path="/solutions" />
@@ -117,15 +115,15 @@ export default function Solutions() {
         <div className="container">
           <div className="process">
             <div className="process__head">
-              <span className="eyebrow">{t('solutions.processEyebrow')}</span>
-              <h2 className="h3 process__title">{t('solutions.processTitle')}</h2>
+              <span className="eyebrow">{pick(hero.deliveryEyebrow)}</span>
+              <h2 className="h3 process__title">{pick(hero.deliveryHeading)}</h2>
             </div>
             <ol className="process__steps" role="list">
-              {process.map((p, i) => (
+              {hero.steps.map((step, i) => (
                 <Reveal as="li" className="process__step" key={i} delay={i * 80}>
                   <span className="process__num">{String(i + 1).padStart(2, '0')}</span>
-                  <h3 className="h4">{p.title}</h3>
-                  <p className="text-muted">{p.body}</p>
+                  <h3 className="h4">{pick(step.title)}</h3>
+                  <p className="text-muted">{pick(step.description)}</p>
                 </Reveal>
               ))}
             </ol>
