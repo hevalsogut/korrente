@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-label="Korrente">
-  <rect width="40" height="40" rx="10" fill="#47A257" />
-  <path d="M22.5 8.5 13 22h6.2l-2 9.5L27 17.5h-6.3z" fill="#fff" stroke="#fff" stroke-width="0.5" stroke-linejoin="round" />
+  <rect x="15" y="4" width="10" height="5" rx="1.5" fill="#47A257" />
+  <rect x="8" y="8" width="24" height="29" rx="6" fill="#47A257" />
+  <path d="M22 11 14 23h5l-2 11 9-14h-5.5z" fill="#fff" stroke="#fff" stroke-width="0.5" stroke-linejoin="round" />
 </svg>
