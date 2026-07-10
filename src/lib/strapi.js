@@ -1,10 +1,13 @@
 /* ------------------------------------------------------------------
-   Strapi CMS client — Articles, Projects, Roles.
+   Strapi CMS client — Articles, Projects, Roles, Solutions.
    Strapi 5 returns a flattened response: json.data is an array with
    fields directly on each item (no `.attributes`) plus `documentId`.
-   We map each entry back into the exact shape src/data/content.js uses,
-   so pages can consume CMS data or the static fallback interchangeably.
+   We map each entry back into the exact shape src/data/content.js /
+   src/data/services.js uses, so pages can consume CMS data or the
+   static fallback interchangeably.
    ------------------------------------------------------------------ */
+
+import { services } from '../data/services.js'
 
 const BASE = import.meta.env.VITE_STRAPI_URL
 
@@ -85,4 +88,38 @@ export async function fetchRoleBySlug(slug) {
   const json = await fetchJson(`positions?filters[slug][$eq]=${encodeURIComponent(slug)}`)
   const item = json.data[0]
   return item ? mapRole(item) : null
+}
+
+/* Solutions map to the exact shape src/data/services.js uses (name,
+   summary, description, features as { en:[...], tr:[...] }, metric,
+   icon), so Solutions.jsx / Home.jsx / ServiceCard.jsx need no changes
+   beyond swapping their data source. */
+function mapSolution(item) {
+  const features = item.features || []
+  return {
+    id: item.documentId,
+    icon: item.iconKey,
+    name: { en: item.titleEn, tr: item.titleTr },
+    summary: { en: item.taglineEn, tr: item.taglineTr },
+    description: { en: item.descriptionEn, tr: item.descriptionTr },
+    features: {
+      en: features.map((f) => f.en),
+      tr: features.map((f) => f.tr)
+    },
+    metric: item.statValue
+      ? { value: item.statValue, unit: item.statUnit, label: { en: item.statLabelEn, tr: item.statLabelTr } }
+      : null,
+    image: item.image?.url ? `${BASE}${item.image.url}` : null
+  }
+}
+
+export async function fetchSolutions() {
+  try {
+    const json = await fetchJson('solutions?sort=order:asc&populate=*')
+    const mapped = json.data?.map(mapSolution) ?? []
+    return mapped.length > 0 ? mapped : services
+  } catch (err) {
+    console.warn('Falling back to static solutions:', err)
+    return services
+  }
 }

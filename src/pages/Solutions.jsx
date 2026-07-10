@@ -1,14 +1,23 @@
+import { useEffect, useState } from 'react'
 import Seo from '../components/Seo.jsx'
 import PageHero from '../components/PageHero.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
-import { services } from '../data/services.js'
+import { services as staticServices } from '../data/services.js'
+import { fetchSolutions } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Solutions.css'
 
 export default function Solutions() {
   const { t, pick, lang } = useI18n()
+  const [services, setServices] = useState(staticServices)
+
+  useEffect(() => {
+    fetchSolutions()
+      .then(setServices)
+      .catch((err) => console.warn('Falling back to static solutions:', err))
+  }, [])
 
   const seo = {
     en: {
@@ -55,13 +64,15 @@ export default function Solutions() {
               <Reveal className="solution-detail__media">
                 <div className="solution-detail__visual">
                   <Icon name={service.icon} size={64} strokeWidth={1.2} />
-                  <div className="solution-detail__metric">
-                    <span className="solution-detail__metric-value">
-                      {service.metric.value}
-                      <em>{service.metric.unit}</em>
-                    </span>
-                    <span className="solution-detail__metric-label">{pick(service.metric.label)}</span>
-                  </div>
+                  {service.metric && (
+                    <div className="solution-detail__metric">
+                      <span className="solution-detail__metric-value">
+                        {service.metric.value}
+                        <em>{service.metric.unit}</em>
+                      </span>
+                      <span className="solution-detail__metric-label">{pick(service.metric.label)}</span>
+                    </div>
+                  )}
                 </div>
               </Reveal>
 
