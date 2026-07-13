@@ -3,6 +3,7 @@ import Seo from '../components/Seo.jsx'
 import PageHero from '../components/PageHero.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
+import Button from '../components/Button.jsx'
 import {
   CALCULATOR_MODES,
   DEFAULT_MODE,
@@ -143,6 +144,75 @@ function fmtCurrency(lang, value, digits = 0) {
     maximumFractionDigits: digits,
     minimumFractionDigits: digits
   }).format(value)
+}
+
+/* Raw number for CSV export — plain, dot-decimal, max 2 places, no
+   thousands separators. Excel (NL/TR) parses this correctly once the
+   file uses a semicolon delimiter, regardless of Excel's own locale. */
+function csvNumber(value) {
+  return value == null ? '' : Number(value).toFixed(2)
+}
+
+/* Quote a field only if it contains the delimiter, a quote, or a
+   newline — keeps the common case (plain numbers/labels) unquoted. */
+function csvField(value) {
+  const str = String(value)
+  return /[";\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str
+}
+
+function csvRow(fields) {
+  return fields.map(csvField).join(';')
+}
+
+/* Builds the full CSV: per-year cashflow rows (mirrors the table),
+   then a blank line and a summary block with the headline figures and
+   the input assumptions, so the export is self-documenting. */
+function buildCashflowCsv({ t, inputs, results }) {
+  const csv = (key) => t(`calculator.lifecycle.csv.${key}`)
+  const rows = []
+
+  rows.push([csv('colYear'), csv('colSoh'), csv('colEnergy'), csv('colArbitrageNet'), csv('colNet'), csv('colDiscounted')])
+  results.lifecycle.years.forEach((y) => {
+    rows.push([
+      y.year,
+      csvNumber(y.soh_pct),
+      csvNumber(y.energy_discharged_mwh),
+      csvNumber(y.arbitrage_net_eur),
+      csvNumber(y.net_eur),
+      csvNumber(y.discounted_net_eur)
+    ])
+  })
+
+  rows.push([])
+  rows.push([csv('summaryTitle')])
+  rows.push([csv('totalCapex'), csvNumber(results.capex_eur)])
+  rows.push([csv('lcos'), csvNumber(results.lifecycle.lcos_eur_per_mwh)])
+  rows.push([csv('npv'), csvNumber(results.lifecycle.npv_eur)])
+  rows.push([csv('payback'), csvNumber(results.payback_years)])
+  rows.push([csv('roi'), csvNumber(results.roi_pct)])
+
+  rows.push([])
+  rows.push([csv('assumptionsTitle')])
+  rows.push([csv('mode'), inputs.mode === 'solar' ? t('calculator.modeSolar') : t('calculator.modeGrid')])
+  rows.push([csv('power'), csvNumber(inputs.power_mw)])
+  rows.push([csv('duration'), csvNumber(inputs.duration_h)])
+  rows.push([csv('priceSpread'), csvNumber(inputs.price_spread_eur_mwh)])
+  rows.push([csv('cycles'), csvNumber(inputs.cycles_per_year)])
+
+  return '﻿' + rows.map(csvRow).join('\n')
+}
+
+function downloadCashflowCsv({ t, inputs, results }) {
+  const csvContent = buildCashflowCsv({ t, inputs, results })
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'korrente-revenue-projection.csv'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
 }
 
 export default function Calculator() {
@@ -537,7 +607,19 @@ export default function Calculator() {
                 {t('calculator.lifecycle.viabilityNote').replace('{spread}', spreadLabel).replace('{lcos}', lcosLabel)}
               </p>
 
-              <h4 className="calc-subtitle">{t('calculator.lifecycle.tableTitle')}</h4>
+              <div className="calc-table-head">
+                <h4 className="calc-subtitle">{t('calculator.lifecycle.tableTitle')}</h4>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="md"
+                  icon={null}
+                  className="calc-table-download"
+                  onClick={() => downloadCashflowCsv({ t, inputs, results })}
+                >
+                  {t('calculator.lifecycle.downloadCsv')}
+                </Button>
+              </div>
               <p className="calc-field__help">{t('calculator.lifecycle.tableNote')}</p>
               <div className="calc-table-scroll">
                 <table className="calc-table">

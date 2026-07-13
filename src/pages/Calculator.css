@@ -321,6 +321,18 @@
 }
 
 /* Per-year cashflow table */
+.calc-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+.calc-table-head .calc-subtitle {
+  margin-top: 0;
+}
+.calc-table-download {
+  flex-shrink: 0;
+}
 .calc-table-scroll {
   overflow-x: auto;
   border: 1px solid var(--paper-200);

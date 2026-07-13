@@ -359,7 +359,28 @@ export const ui = {
         colEnergy: 'Energy discharged (battery, MWh)',
         colArbitrageNet: 'Arbitrage-only net',
         colNet: 'Net cashflow (total)',
-        colDiscounted: 'Discounted net (total)'
+        colDiscounted: 'Discounted net (total)',
+        downloadCsv: 'Download CSV',
+        csv: {
+          colYear: 'Year',
+          colSoh: 'SoH %',
+          colEnergy: 'Energy discharged (battery, MWh)',
+          colArbitrageNet: 'Arbitrage-only net (EUR)',
+          colNet: 'Net cashflow (EUR)',
+          colDiscounted: 'Discounted net (EUR)',
+          summaryTitle: 'Summary',
+          totalCapex: 'Total CAPEX (EUR)',
+          lcos: 'LCOS (EUR/MWh)',
+          npv: 'NPV (EUR)',
+          payback: 'Payback (years)',
+          roi: 'ROI (%)',
+          assumptionsTitle: 'Assumptions',
+          mode: 'Mode',
+          power: 'Power (MW)',
+          duration: 'Duration (h)',
+          priceSpread: 'Price spread (EUR/MWh)',
+          cycles: 'Cycles/yr'
+        }
       },
       solarResults: {
         sectionTitle: 'Solar economics',
@@ -743,7 +764,28 @@ export const ui = {
         colEnergy: 'Deşarj edilen enerji (batarya, MWh)',
         colArbitrageNet: 'Yalnızca arbitraj net',
         colNet: 'Net nakit akışı (toplam)',
-        colDiscounted: 'İskontolu net (toplam)'
+        colDiscounted: 'İskontolu net (toplam)',
+        downloadCsv: 'CSV indir',
+        csv: {
+          colYear: 'Yıl',
+          colSoh: 'SoH %',
+          colEnergy: 'Deşarj edilen enerji (batarya, MWh)',
+          colArbitrageNet: 'Yalnızca arbitraj net (EUR)',
+          colNet: 'Net nakit akışı (EUR)',
+          colDiscounted: 'İskontolu net (EUR)',
+          summaryTitle: 'Özet',
+          totalCapex: 'Toplam CAPEX (EUR)',
+          lcos: 'LCOS (EUR/MWh)',
+          npv: 'NPV (EUR)',
+          payback: 'Geri ödeme (yıl)',
+          roi: 'ROI (%)',
+          assumptionsTitle: 'Varsayımlar',
+          mode: 'Mod',
+          power: 'Güç (MW)',
+          duration: 'Süre (saat)',
+          priceSpread: 'Fiyat farkı (EUR/MWh)',
+          cycles: 'Çevrim/yıl'
+        }
       },
       solarResults: {
         sectionTitle: 'Güneş ekonomisi',
