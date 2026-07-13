@@ -30,11 +30,11 @@ function mapArticle(item) {
   return {
     id: item.documentId,
     slug: item.slug,
-    title: { en: item.titleEn, tr: item.titleTr },
-    excerpt: { en: item.excerptEn, tr: item.excerptTr },
-    category: { en: item.categoryEn, tr: item.categoryTr },
-    readingTime: { en: item.readingTimeEn, tr: item.readingTimeTr },
-    body: { en: item.bodyEn, tr: item.bodyTr },
+    title: item.titleEn,
+    excerpt: item.excerptEn,
+    category: item.categoryEn,
+    readingTime: item.readingTimeEn,
+    body: item.bodyEn,
     date: item.date,
     featured: item.featured,
     coverUrl: item.image?.url ? `${BASE}${item.image.url}` : null
@@ -60,8 +60,8 @@ function mapProject(item) {
     location: item.location,
     capacity: item.capacity,
     status: item.projectStatus,
-    type: { en: item.typeEn, tr: item.typeTr },
-    description: { en: item.descriptionEn, tr: item.descriptionTr }
+    type: item.typeEn,
+    description: item.descriptionEn
   }
 }
 
@@ -76,28 +76,7 @@ export async function fetchProjectBySlug(slug) {
   return item ? mapProject(item) : null
 }
 
-function mapRole(item) {
-  return {
-    id: item.documentId,
-    slug: item.slug,
-    title: { en: item.titleEn, tr: item.titleTr },
-    team: { en: item.teamEn, tr: item.teamTr },
-    location: item.location,
-    type: { en: item.typeEn, tr: item.typeTr },
-    description: { en: item.descriptionEn, tr: item.descriptionTr }
-  }
-}
 
-export async function fetchRoles() {
-  const json = await fetchJson('positions')
-  return json.data.map(mapRole)
-}
-
-export async function fetchRoleBySlug(slug) {
-  const json = await fetchJson(`positions?filters[slug][$eq]=${encodeURIComponent(slug)}`)
-  const item = json.data[0]
-  return item ? mapRole(item) : null
-}
 
 /* Solutions map to the exact shape src/data/services.js uses (name,
    summary, description, features as { en:[...], tr:[...] }, metric,
@@ -108,15 +87,12 @@ function mapSolution(item) {
   return {
     id: item.documentId,
     icon: item.iconKey,
-    name: { en: item.titleEn, tr: item.titleTr },
-    summary: { en: item.taglineEn, tr: item.taglineTr },
-    description: { en: item.descriptionEn, tr: item.descriptionTr },
-    features: {
-      en: features.map((f) => f.en),
-      tr: features.map((f) => f.tr)
-    },
+    name: item.titleEn,
+    summary: item.taglineEn,
+    description: item.descriptionEn,
+    features: features.map((f) => f.en),
     metric: item.statValue
-      ? { value: item.statValue, unit: item.statUnit, label: { en: item.statLabelEn, tr: item.statLabelTr } }
+      ? { value: item.statValue, unit: item.statUnit, label: item.statLabelEn }
       : null,
     image: toAbsoluteMediaUrl(item.image?.url)
   }
@@ -138,45 +114,27 @@ export async function fetchSolutions() {
    copy previously hardcoded in src/i18n/ui.js under `solutions.eyebrow`
    / `.title` / `.lead` / `.processEyebrow` / `.processTitle` / `.process`. */
 export const SOLUTIONS_PAGE_FALLBACK = {
-  eyebrow: { en: 'Solutions', tr: 'Çözümler' },
-  heading: { en: 'Every layer of dependable clean energy.', tr: 'Güvenilir temiz enerjinin her katmanı.' },
-  subhead: {
-    en: 'We develop, build, and operate across the full clean energy stack — and tie it together with software that makes renewables behave like firm, plannable power.',
-    tr: 'Temiz enerji yığınının tamamında geliştirir, kurar ve işletiriz — ve hepsini, yenilenebilir enerjiyi kesintisiz ve planlanabilir bir güç gibi davranmaya iten yazılımla birbirine bağlarız.'
-  },
-  deliveryEyebrow: { en: 'How we deliver', tr: 'Nasıl teslim ederiz' },
-  deliveryHeading: {
-    en: 'From origination to decades of operation.',
-    tr: 'Kaynak bulmadan onlarca yıllık işletmeye.'
-  },
+  eyebrow: 'Solutions',
+  heading: 'Every layer of dependable clean energy.',
+  subhead: 'We develop, build, and operate across the full clean energy stack — and tie it together with software that makes renewables behave like firm, plannable power.',
+  deliveryEyebrow: 'How we deliver',
+  deliveryHeading: 'From origination to decades of operation.',
   steps: [
     {
-      title: { en: 'Originate', tr: 'Kaynak bul' },
-      description: {
-        en: 'Site, resource, and interconnection analysis to find projects that genuinely pencil out.',
-        tr: 'Gerçekten fizibil projeler bulmak için saha, kaynak ve şebeke bağlantısı analizi.'
-      }
+      title: 'Originate',
+      description: 'Site, resource, and interconnection analysis to find projects that genuinely pencil out.'
     },
     {
-      title: { en: 'Develop', tr: 'Geliştir' },
-      description: {
-        en: 'Permitting, community engagement, and engineering to make a project buildable and bankable.',
-        tr: 'Bir projeyi inşa edilebilir ve finanse edilebilir kılmak için izinler, topluluk katılımı ve mühendislik.'
-      }
+      title: 'Develop',
+      description: 'Permitting, community engagement, and engineering to make a project buildable and bankable.'
     },
     {
-      title: { en: 'Build', tr: 'İnşa et' },
-      description: {
-        en: 'Disciplined EPC oversight that delivers on schedule, on budget, and to spec.',
-        tr: 'Zamanında, bütçesinde ve şartnamesine uygun teslim eden disiplinli EPC gözetimi.'
-      }
+      title: 'Build',
+      description: 'Disciplined EPC oversight that delivers on schedule, on budget, and to spec.'
     },
     {
-      title: { en: 'Operate', tr: 'İşlet' },
-      description: {
-        en: 'Decades of asset management and optimisation through our grid-intelligence platform.',
-        tr: 'Şebeke zekâsı platformumuz aracılığıyla onlarca yıllık varlık yönetimi ve optimizasyon.'
-      }
+      title: 'Operate',
+      description: 'Decades of asset management and optimisation through our grid-intelligence platform.'
     }
   ]
 }
@@ -184,14 +142,14 @@ export const SOLUTIONS_PAGE_FALLBACK = {
 function mapSolutionsPage(item) {
   const steps = item.steps || []
   return {
-    eyebrow: { en: item.eyebrowEn, tr: item.eyebrowTr },
-    heading: { en: item.headingEn, tr: item.headingTr },
-    subhead: { en: item.subheadEn, tr: item.subheadTr },
-    deliveryEyebrow: { en: item.deliveryEyebrowEn, tr: item.deliveryEyebrowTr },
-    deliveryHeading: { en: item.deliveryHeadingEn, tr: item.deliveryHeadingTr },
+    eyebrow: item.eyebrowEn,
+    heading: item.headingEn,
+    subhead: item.subheadEn,
+    deliveryEyebrow: item.deliveryEyebrowEn,
+    deliveryHeading: item.deliveryHeadingEn,
     steps: steps.map((s) => ({
-      title: { en: s.titleEn, tr: s.titleTr },
-      description: { en: s.descriptionEn, tr: s.descriptionTr }
+      title: s.titleEn,
+      description: s.descriptionEn
     }))
   }
 }

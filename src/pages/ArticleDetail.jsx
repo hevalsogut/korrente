@@ -41,7 +41,7 @@ export default function ArticleDetail() {
   }, [slug])
 
   const formatDate = (iso) =>
-    new Date(iso).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', {
+    new Date(iso).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

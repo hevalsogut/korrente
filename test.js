@@ -228,6 +228,146 @@ const badInputs4 = { ...defaultInputs, power_mw: '', duration_h: null };
 const r4 = calculateRevenue(badInputs4);
 checkNoNaNInfinity(r4, 'Blank inputs: ');
 
+// GROUP 7 - Lifetime economics cards: "Lifetime net profit" + "In
+// today's money (NPV)" (Calculator.jsx, UI-only — not a field on the
+// calculateRevenue() return value). `cardLifetimeProfit` mirrors the
+// exact formula the card uses, so these checks exercise that formula
+// against calculator.js's trusted per-year output, in both modes.
+function cardLifetimeProfit(result) {
+  const sumNet = result.lifecycle.years.reduce((sum, yr) => sum + yr.net_eur, 0);
+  return sumNet - result.capex_eur;
+}
+
+// --- GROUP A: Grid mode (reuses g1Result: grid, 100MW, 2h, spread 130, defaults) ---
+
+// A1: identity — card value must equal an independent re-sum of the
+// returned per-year array minus capex_eur, to the cent.
+const a1IndependentSum = g1Result.lifecycle.years.reduce((sum, yr) => sum + yr.net_eur, 0);
+const a1Independent = a1IndependentSum - g1Result.capex_eur;
+const a1CardProfit = cardLifetimeProfit(g1Result);
+assertClose(a1CardProfit, a1Independent, 0.01, 'A1 (Grid): Lifetime profit == Σnet_eur - capex_eur (to the cent)');
+
+// A2: ordering invariant — undiscounted total >= discounted total.
+const a2Npv = g1Result.lifecycle.npv_eur;
+const a2Ratio = a2Npv / a1CardProfit;
+console.log(`   [A2 report] Grid: profit=€${a1CardProfit.toFixed(2)} npv=€${a2Npv.toFixed(2)} ratio(npv/profit)=${a2Ratio.toFixed(4)}`);
+assert(
+  a1CardProfit >= a2Npv,
+  'A2 (Grid): Ordering - lifetime profit >= NPV',
+  '>= NPV',
+  a1CardProfit,
+  `profit=${a1CardProfit.toFixed(2)} npv=${a2Npv.toFixed(2)} ratio=${a2Ratio.toFixed(4)}`
+);
+
+// A3: NPV identity — independently discount each year's net_eur (not
+// calculator.js's own discounted_net_eur field) and compare.
+const a3R = g1Result.lifecycle.discount_rate_pct / 100;
+const a3Independent =
+  -g1Result.capex_eur + g1Result.lifecycle.years.reduce((sum, yr) => sum + yr.net_eur / Math.pow(1 + a3R, yr.year), 0);
+assertClose(g1Result.lifecycle.npv_eur, a3Independent, 0.01, "A3 (Grid): NPV == -capex + Σ(net_eur[t] / (1+r)^t)");
+
+// A4: label uses live project_life_years, not a hardcoded 15.
+const life20Inputs = { ...defaultInputs, project_life_years: 20 };
+const life20Result = calculateRevenue(life20Inputs);
+assert(life20Result.lifecycle.years.length === 20, 'A4 (Grid): project_life_years=20 yields 20 per-year rows, not 15', 20, life20Result.lifecycle.years.length);
+const life20Profit = cardLifetimeProfit(life20Result);
+const life20SummedOver15Only = life20Result.lifecycle.years.slice(0, 15).reduce((sum, yr) => sum + yr.net_eur, 0) - life20Result.capex_eur;
+assert(
+  Math.abs(life20Profit - life20SummedOver15Only) > 1,
+  'A4 (Grid): 20yr profit genuinely sums 20 years (differs from a hardcoded-15 truncation)',
+  'differs from 15yr-truncated sum',
+  life20Profit,
+  `20yr sum=${life20Profit.toFixed(2)} vs first-15-only=${life20SummedOver15Only.toFixed(2)}`
+);
+
+// --- GROUP B: Solar mode (reuses solarResult: solar, 100MW, 2h, pv_size_mwp 100, defaults) ---
+
+// B5: identity holds in solar mode too, and solar CAPEX > grid CAPEX for the same battery.
+assert(solarResult.capex_eur > g1Result.capex_eur, 'B5 (Solar): Solar capex_eur > Grid capex_eur for the same battery', '> grid capex', solarResult.capex_eur);
+const b5IndependentSum = solarResult.lifecycle.years.reduce((sum, yr) => sum + yr.net_eur, 0);
+const b5Independent = b5IndependentSum - solarResult.capex_eur;
+const b5CardProfit = cardLifetimeProfit(solarResult);
+assertClose(b5CardProfit, b5Independent, 0.01, 'B5 (Solar): Lifetime profit == Σnet_eur - capex_eur (to the cent)');
+
+// B6: ordering invariant, solar mode.
+const b6Npv = solarResult.lifecycle.npv_eur;
+assert(
+  b5CardProfit >= b6Npv,
+  'B6 (Solar): Ordering - lifetime profit >= NPV',
+  '>= NPV',
+  b5CardProfit,
+  `profit=${b5CardProfit.toFixed(2)} npv=${b6Npv.toFixed(2)} ratio=${(b6Npv / b5CardProfit).toFixed(4)}`
+);
+
+// B7: revenue-source consistency — solar mode nets more each year (R_solar
+// added) despite the higher CAPEX (and its higher OPEX) already checked in B5.
+assert(solarResult.annual_net_eur > g1Result.annual_net_eur, 'B7 (Solar): Solar annual_net_eur > Grid annual_net_eur (R_solar included)', '> grid annual_net', solarResult.annual_net_eur);
+let b7AllYearsHigher = true;
+for (let i = 0; i < solarResult.lifecycle.years.length; i++) {
+  if (solarResult.lifecycle.years[i].net_eur <= g1Result.lifecycle.years[i].net_eur) b7AllYearsHigher = false;
+}
+assert(b7AllYearsHigher, 'B7 (Solar): Every year net_eur higher than grid mode (R_solar carried through the per-year loop)', true, b7AllYearsHigher);
+
+// B8: cross-mode sanity — fast-payback solar should lose less value to
+// discounting, so its NPV/profit ratio sits closer to 1 than grid's.
+const b8GridRatio = a2Npv / a1CardProfit;
+const b8SolarRatio = b6Npv / b5CardProfit;
+console.log(`   [B8 report] Grid ratio(npv/profit)=${b8GridRatio.toFixed(4)} | Solar ratio(npv/profit)=${b8SolarRatio.toFixed(4)}`);
+assert(
+  Math.abs(b8SolarRatio - 1) < Math.abs(b8GridRatio - 1),
+  'B8: Solar NPV/profit ratio closer to 1 than grid (faster payback -> less discounting loss)',
+  'solar closer to 1',
+  `solar=${b8SolarRatio.toFixed(4)} grid=${b8GridRatio.toFixed(4)}`
+);
+
+// --- GROUP C: Guardrails, both modes ---
+
+// C9: negative case — extreme capex_energy_eur_kwh must yield a real,
+// finite negative profit (not clamped to 0, not NaN), in both modes.
+const c9GridResult = calculateRevenue({ ...defaultInputs, capex_energy_eur_kwh: 1000000 });
+const c9GridProfit = cardLifetimeProfit(c9GridResult);
+assert(Number.isFinite(c9GridProfit), 'C9 (Grid): Lifetime profit stays finite under extreme CAPEX', 'finite', c9GridProfit);
+assert(c9GridProfit < 0, 'C9 (Grid): Lifetime profit goes negative under extreme CAPEX (not clamped to 0)', '< 0', c9GridProfit);
+
+const c9SolarResult = calculateRevenue({ ...solarInputs, capex_energy_eur_kwh: 1000000 });
+const c9SolarProfit = cardLifetimeProfit(c9SolarResult);
+assert(Number.isFinite(c9SolarProfit), 'C9 (Solar): Lifetime profit stays finite under extreme CAPEX', 'finite', c9SolarProfit);
+assert(c9SolarProfit < 0, 'C9 (Solar): Lifetime profit goes negative under extreme CAPEX (not clamped to 0)', '< 0', c9SolarProfit);
+
+// C10: degradation coupling — raising cycles_per_year must move the card
+// (not a static sum) and the SoH/energy curve must genuinely steepen.
+const c10GridResult = calculateRevenue({ ...defaultInputs, cycles_per_year: 550 });
+const c10GridProfit = cardLifetimeProfit(c10GridResult);
+assert(c10GridProfit !== a1CardProfit, 'C10 (Grid): Lifetime profit changes when cycles_per_year rises 365->550', '!= baseline', c10GridProfit);
+assert(
+  c10GridResult.degradation.soh_end_of_life_pct < g1Result.degradation.soh_end_of_life_pct,
+  'C10 (Grid): End-of-life SoH lower at 550 cycles/yr than 365 (curve steepens)',
+  '< baseline',
+  c10GridResult.degradation.soh_end_of_life_pct
+);
+assert(
+  c10GridResult.lifecycle.years[0].energy_discharged_mwh > g1Result.lifecycle.years[0].energy_discharged_mwh,
+  'C10 (Grid): Year-1 energy discharged higher at 550 cycles/yr than 365',
+  '> baseline',
+  c10GridResult.lifecycle.years[0].energy_discharged_mwh
+);
+
+const c10SolarResult = calculateRevenue({ ...solarInputs, cycles_per_year: 550 });
+const c10SolarProfit = cardLifetimeProfit(c10SolarResult);
+assert(c10SolarProfit !== b5CardProfit, 'C10 (Solar): Lifetime profit changes when cycles_per_year rises 365->550', '!= baseline', c10SolarProfit);
+assert(
+  c10SolarResult.degradation.soh_end_of_life_pct < solarResult.degradation.soh_end_of_life_pct,
+  'C10 (Solar): End-of-life SoH lower at 550 cycles/yr than 365 (curve steepens)',
+  '< baseline',
+  c10SolarResult.degradation.soh_end_of_life_pct
+);
+assert(
+  c10SolarResult.lifecycle.years[0].energy_discharged_mwh > solarResult.lifecycle.years[0].energy_discharged_mwh,
+  'C10 (Solar): Year-1 energy discharged higher at 550 cycles/yr than 365',
+  '> baseline',
+  c10SolarResult.lifecycle.years[0].energy_discharged_mwh
+);
+
 // Print summary
 results.forEach(r => {
   if (r.status === 'PASS') {

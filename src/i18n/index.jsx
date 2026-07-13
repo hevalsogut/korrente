@@ -1,48 +1,17 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect } from 'react'
 import { ui } from './ui.js'
 
 /**
  * Lightweight i18n. No dependencies.
- *  - `lang`     current language ('en' | 'tr')
- *  - `setLang`  switch language (persisted to localStorage)
+ *  - `lang`     current language (hardcoded to 'en')
  *  - `t(path)`  look up a dotted key in the UI dictionary, e.g. t('nav.about')
- *  - `pick(a)`  select a language variant from a bilingual data object
- *
- * Big content lives in src/data/* as `{ en: [...], tr: [...] }`; UI microcopy
- * lives in src/i18n/ui.js. To add a language, extend both.
+ *  - `pick(a)`  select a language variant from a bilingual data object, or return string
  */
 
-export const LANGUAGES = [
-  { code: 'en', label: 'EN', name: 'English' },
-  { code: 'tr', label: 'TR', name: 'Türkçe' }
-]
-
-const STORAGE_KEY = 'korrente-lang'
 const I18nContext = createContext(null)
 
-function detectInitialLang() {
-  if (typeof window === 'undefined') return 'en'
-  try {
-    const saved = window.localStorage?.getItem(STORAGE_KEY)
-    if (saved === 'en' || saved === 'tr') return saved
-  } catch {
-    /* localStorage may be unavailable */
-  }
-  const nav = (navigator.language || 'en').slice(0, 2).toLowerCase()
-  return nav === 'tr' ? 'tr' : 'en'
-}
-
 export function I18nProvider({ children }) {
-  const [lang, setLangState] = useState(detectInitialLang)
-
-  const setLang = useCallback((next) => {
-    setLangState(next)
-    try {
-      window.localStorage?.setItem(STORAGE_KEY, next)
-    } catch {
-      /* ignore */
-    }
-  }, [])
+  const lang = 'en'
 
   useEffect(() => {
     document.documentElement.lang = lang
@@ -58,10 +27,15 @@ export function I18nProvider({ children }) {
     [lang]
   )
 
-  const pick = useCallback((bilingual) => bilingual?.[lang] ?? bilingual?.en, [lang])
+  const pick = useCallback((val) => {
+    if (val && typeof val === 'object' && !Array.isArray(val) && 'en' in val) {
+      return val.en
+    }
+    return val
+  }, [])
 
   return (
-    <I18nContext.Provider value={{ lang, setLang, t, pick }}>{children}</I18nContext.Provider>
+    <I18nContext.Provider value={{ lang, t, pick }}>{children}</I18nContext.Provider>
   )
 }
 

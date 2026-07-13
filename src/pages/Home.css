@@ -52,6 +52,7 @@
 
 .hero__visual {
   justify-self: center;
+  width: 100%;
 }
 
 /* Feature row */

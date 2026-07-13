@@ -24,24 +24,17 @@ export default function News() {
   }, [])
 
   const formatDate = (iso) =>
-    new Date(iso).toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', {
+    new Date(iso).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     })
 
   const seo = {
-    en: {
-      title: 'Insights',
-      description:
-        'Perspectives from Korrente on the energy transition — firm renewables, storage, grid reform, policy, and the technology that makes clean power dependable.'
-    },
-    tr: {
-      title: 'İçgörüler',
-      description:
-        'Korrente’dan enerji dönüşümü üzerine bakış açıları — kesintisiz yenilenebilir enerji, depolama, şebeke reformu, politika ve temiz enerjiyi güvenilir kılan teknoloji.'
-    }
-  }[lang]
+    title: 'Insights',
+    description:
+      'Perspectives from Korrente on the energy transition — firm renewables, storage, grid reform, policy, and the technology that makes clean power dependable.'
+  }
 
   // Categories keyed by the stable English value so filtering survives language switches.
   const categories = [

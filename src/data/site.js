@@ -7,7 +7,7 @@
 export const company = {
   name: 'Korrente',
   foundedYear: 2011,
-  email: 'hello@korrente.com',
+  email: 'info@korrente.com',
   pressEmail: 'press@korrente.com',
   phone: '+1 (415) 555-0147',
   address: {
@@ -19,53 +19,42 @@ export const company = {
 
 /* Primary navigation — matches the reference header */
 export const navLinks = [
-  { to: '/solutions', label: { en: 'Solutions', tr: 'Çözümler' } },
-  { to: '/technology', label: { en: 'Technology', tr: 'Teknoloji' } },
-  { to: '/projects', label: { en: 'Projects', tr: 'Projeler' } },
-  { to: '/calculator', label: { en: 'Revenue Calculator', tr: 'Gelir Hesaplayıcı' } },
-  { to: '/about', label: { en: 'Company', tr: 'Şirket' } },
-  { to: '/news', label: { en: 'News', tr: 'Haberler' } },
-  { to: '/careers', label: { en: 'Careers', tr: 'Kariyer' } }
-]
-
-export const socials = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/', short: 'in' },
-  { label: 'X', href: 'https://x.com/', short: 'X' },
-  { label: 'YouTube', href: 'https://www.youtube.com/', short: 'yt' },
-  { label: 'GitHub', href: 'https://github.com/', short: 'gh' }
+  { to: '/solutions', label: 'Solutions' },
+  { to: '/technology', label: 'Technology' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/calculator', label: 'Revenue Calculator' },
+  { to: '/news', label: 'News' }
 ]
 
 export const footerNav = [
   {
-    title: { en: 'Company', tr: 'Şirket' },
+    title: 'Explore',
     links: [
-      { to: '/about', label: { en: 'About', tr: 'Hakkımızda' } },
-      { to: '/sustainability', label: { en: 'Sustainability', tr: 'Sürdürülebilirlik' } },
-      { to: '/news', label: { en: 'Insights', tr: 'İçgörüler' } },
-      { to: '/about', label: { en: 'Careers', tr: 'Kariyer' } }
+      { to: '/sustainability', label: 'Sustainability' },
+      { to: '/news', label: 'Insights' }
     ]
   },
   {
-    title: { en: 'Solutions', tr: 'Çözümler' },
+    title: 'Solutions',
     links: [
-      { to: '/solutions', label: { en: 'Utility-Scale Solar', tr: 'Şebeke Ölçekli Güneş' } },
-      { to: '/solutions', label: { en: 'Wind Development', tr: 'Rüzgâr Geliştirme' } },
-      { to: '/solutions', label: { en: 'Energy Storage', tr: 'Enerji Depolama' } },
-      { to: '/solutions', label: { en: 'Grid Intelligence', tr: 'Şebeke Zekâsı' } }
+      { to: '/solutions', label: 'Utility-Scale Solar' },
+      { to: '/solutions', label: 'Wind Development' },
+      { to: '/solutions', label: 'Energy Storage' },
+      { to: '/solutions', label: 'Grid Intelligence' }
     ]
   },
   {
-    title: { en: 'Connect', tr: 'Bağlantı' },
+    title: 'Connect',
     links: [
-      { to: '/contact', label: { en: 'Contact', tr: 'İletişim' } },
-      { to: '/contact', label: { en: 'Partner with us', tr: 'Bizimle ortak olun' } },
-      { to: '/contact', label: { en: 'Press', tr: 'Basın' } }
+      { to: '/contact', label: 'Contact' },
+      { to: '/contact', label: 'Partner with us' },
+      { to: '/contact', label: 'Press' }
     ]
   }
 ]
 
 export const legalLinks = [
-  { to: '/', label: { en: 'Privacy', tr: 'Gizlilik' } },
-  { to: '/', label: { en: 'Terms', tr: 'Şartlar' } },
-  { to: '/', label: { en: 'Cookies', tr: 'Çerezler' } }
+  { to: '/', label: 'Privacy' },
+  { to: '/', label: 'Terms' },
+  { to: '/', label: 'Cookies' }
 ]

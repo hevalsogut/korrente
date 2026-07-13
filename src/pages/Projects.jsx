@@ -28,9 +28,9 @@ export default function Projects() {
   }, [])
 
   const seo = {
-    en: { title: 'Projects', description: 'Storage and generation projects Korrente has developed, built, and operates across Europe.' },
-    tr: { title: 'Projeler', description: 'Korrente’nin Avrupa genelinde geliştirdiği, kurduğu ve işlettiği depolama ve üretim projeleri.' }
-  }[lang]
+    title: 'Projects',
+    description: 'Storage and generation projects Korrente has developed, built, and operates across Europe.'
+  }
 
   return (
     <>

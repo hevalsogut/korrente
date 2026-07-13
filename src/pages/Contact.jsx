@@ -17,17 +17,10 @@ export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
 
   const seo = {
-    en: {
-      title: 'Contact',
-      description:
-        'Talk to Korrente about developing a project, power offtake, corporate decarbonisation, press, or careers. We respond within two business days.'
-    },
-    tr: {
-      title: 'İletişim',
-      description:
-        'Bir proje geliştirme, elektrik alımı, kurumsal karbonsuzlaşma, basın veya kariyer hakkında Korrente ile görüşün. İki iş günü içinde yanıt veriyoruz.'
-    }
-  }[lang]
+    title: 'Contact',
+    description:
+      'Talk to Korrente about developing a project, power offtake, corporate decarbonisation, press, or careers. We respond within two business days.'
+  }
 
   const topics = t('contact.topics')
 

@@ -127,7 +127,7 @@ function Bar({ label, valueLabel, pct }) {
 }
 
 function locale(lang) {
-  return lang === 'tr' ? 'tr-TR' : 'en-US'
+  return 'en-US'
 }
 
 function fmtNumber(lang, value, digits = 0) {
@@ -239,17 +239,10 @@ export default function Calculator() {
   const isSolar = inputs.mode === 'solar'
 
   const seo = {
-    en: {
-      title: 'Revenue Calculator',
-      description:
-        'Estimate battery storage grid-arbitrage revenue for a Netherlands project — nameplate capacity, CAPEX, annual income, payback, and ROI, recalculated instantly.'
-    },
-    tr: {
-      title: 'Gelir Hesaplayıcı',
-      description:
-        'Hollanda projesi için batarya depolama şebeke arbitrajı gelirini tahmin edin — anma kapasitesi, CAPEX, yıllık gelir, geri ödeme ve ROI anında yeniden hesaplanır.'
-    }
-  }[lang]
+    title: 'Revenue Calculator',
+    description:
+      'Estimate battery storage grid-arbitrage revenue for a Netherlands project — nameplate capacity, CAPEX, annual income, payback, and ROI, recalculated instantly.'
+  }
 
   const update = (key) => (e) => {
     setInputs((prev) => ({ ...prev, [key]: e.target.value }))

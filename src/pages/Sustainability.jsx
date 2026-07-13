@@ -15,17 +15,10 @@ export default function Sustainability() {
   const { t, pick, lang } = useI18n()
 
   const seo = {
-    en: {
-      title: 'Sustainability & Impact',
-      description:
-        "Korrente's sustainability commitments: net-zero operations by 2035, circular materials, nature-positive land, and community reinvestment."
-    },
-    tr: {
-      title: 'Sürdürülebilirlik & Etki',
-      description:
-        'Korrente’nın sürdürülebilirlik taahhütleri: 2035’e kadar net sıfır operasyonlar, döngüsel malzemeler, doğaya olumlu araziler ve topluluğa yeniden yatırım.'
-    }
-  }[lang]
+    title: 'Sustainability & Impact',
+    description:
+      "Korrente's sustainability commitments: net-zero operations by 2035, circular materials, nature-positive land, and community reinvestment."
+  }
 
   const pillars = t('sustainability.pillars')
   const barLabels = t('sustainability.bars')

@@ -3,7 +3,6 @@ import { NavLink, useLocation } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import Button from './Button.jsx'
 import Icon from './Icon.jsx'
-import LanguageSwitcher from './LanguageSwitcher.jsx'
 import { navLinks } from '../data/site.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Header.css'
@@ -64,7 +63,6 @@ export default function Header() {
         </nav>
 
         <div className="site-header__end">
-          <LanguageSwitcher variant="header" />
           <Button to="/contact" size="md" variant="outline" icon={null} className="site-header__cta site-header__contact">
             {t('common.contact')}
           </Button>

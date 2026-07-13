@@ -21,17 +21,10 @@ export default function Home() {
   const { t, pick, lang } = useI18n()
 
   const seo = {
-    en: {
-      title: 'We Manage Energy Flow',
-      description:
-        'Korrente delivers advanced energy storage and system integration solutions for a resilient and flexible energy infrastructure across Europe.'
-    },
-    tr: {
-      title: 'Enerji Akışını Yönetiyoruz',
-      description:
-        'Korrente; dayanıklı ve esnek bir enerji altyapısı için Avrupa genelinde gelişmiş enerji depolama ve sistem entegrasyonu çözümleri sunar.'
-    }
-  }[lang]
+    title: 'We Manage Energy Flow',
+    description:
+      'Korrente delivers advanced energy storage and system integration solutions for a resilient and flexible energy infrastructure across Europe.'
+  }
 
   const features = t('home.features')
 
@@ -108,7 +101,7 @@ export default function Home() {
           <Reveal className="intro__right" delay={120}>
             <p>{t('home.introBody1')}</p>
             <p>{t('home.introBody2')}</p>
-            <Link to="/about" className="intro__link">
+            <Link to="/contact" className="intro__link">
               {t('home.introLink')}
               <Icon name="arrowUpRight" size={18} />
             </Link>

@@ -13,9 +13,9 @@ export default function Technology() {
   const { t, lang } = useI18n()
 
   const seo = {
-    en: { title: 'Technology', description: 'Korrente Grid — the real-time platform that forecasts, dispatches, and optimises our clean-energy fleet.' },
-    tr: { title: 'Teknoloji', description: 'Korrente Grid — temiz enerji filomuzu gerçek zamanlı tahminleyen, sevk eden ve optimize eden platform.' }
-  }[lang]
+    title: 'Technology',
+    description: 'Korrente Grid — the real-time platform that forecasts, dispatches, and optimises our clean-energy fleet.'
+  }
 
   const capabilities = t('technology.capabilities')
 

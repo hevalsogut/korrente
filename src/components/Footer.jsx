@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import Icon from './Icon.jsx'
-import { company, footerNav, socials, legalLinks } from '../data/site.js'
+import { company, footerNav, legalLinks } from '../data/site.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Footer.css'
 
@@ -20,21 +20,7 @@ export default function Footer() {
               <Icon name="mail" size={18} />
               {company.email}
             </a>
-            <ul className="site-footer__socials" role="list" aria-label={t('footer.socials')}>
-              {socials.map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="social-chip"
-                  >
-                    <span aria-hidden="true">{s.short}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
+
           </div>
 
           <nav className="site-footer__nav" aria-label="Footer">

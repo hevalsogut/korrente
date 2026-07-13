@@ -27,17 +27,10 @@ export default function Solutions() {
   }, [])
 
   const seo = {
-    en: {
-      title: 'Solutions',
-      description:
-        'Utility-scale solar, wind, energy storage, grid intelligence, green hydrogen, and transition advisory — the full stack of clean energy infrastructure from Korrente.'
-    },
-    tr: {
-      title: 'Çözümler',
-      description:
-        'Şebeke ölçekli güneş, rüzgâr, enerji depolama, şebeke zekâsı, yeşil hidrojen ve dönüşüm danışmanlığı — Korrente’dan uçtan uca temiz enerji altyapısı.'
-    }
-  }[lang]
+    title: 'Solutions',
+    description:
+      'Utility-scale solar, wind, energy storage, grid intelligence, green hydrogen, and transition advisory — the full stack of clean energy infrastructure from Korrente.'
+  }
 
   return (
     <>
