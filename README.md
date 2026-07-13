@@ -5,12 +5,12 @@ company focused on grid-scale **energy storage** (plus renewables, system
 integration, and green hydrogen).
 
 The site is fast, fully responsive (360 px → large desktop), accessible
-(WCAG AA, keyboard-navigable, semantic HTML), **bilingual (EN / TR)**, and built
+(WCAG AA, keyboard-navigable, semantic HTML), and built
 around a hand-crafted design system — no UI template or component library.
 
 **Visual identity:** a **dark, near-black forest theme** with a vivid green
 accent, refined Manrope/Inter typography, a dark header (green logo, outlined
-Contact button, "EN ⌄" language dropdown), light sections for rhythm, and flat
+Contact button), light sections for rhythm, and flat
 SVG energy illustrations (the hero shows a neon-bolt storage container).
 
 ---
@@ -47,9 +47,9 @@ host (Netlify, Vercel, Cloudflare Pages, S3, GitHub Pages, nginx…).
 | Choice | Why |
 | --- | --- |
 | **Vite + React 18** | Instant dev server, tiny fast production build, and a component model that keeps the many sections/pages organized and reusable. No framework overhead beyond what a marketing site needs. |
-| **React Router** | Clean multi-page routing (Home, Solutions, Technology, Projects, Company/About, News, Careers, Sustainability, Contact, 404) plus dynamic detail pages (`/:slug`) with a shared layout. |
+| **React Router** | Clean multi-page routing (Home, Solutions, Technology, Projects, News, Sustainability, Contact, 404) plus dynamic detail pages (`/:slug`) with a shared layout. |
 | **Plain CSS + custom properties** | A real, transparent design system in `src/index.css` — colour/spacing/type/radii/shadow/motion **tokens** any developer can read and extend. No build-time CSS-in-JS, no Tailwind class soup, no runtime cost. Each component ships its own small `.css` file next to it. |
-| **Custom lightweight i18n** | A ~40-line context (`src/i18n/`) drives the EN/TR switch — no i18n library. UI strings live in `src/i18n/ui.js`; content is bilingual in `src/data/*`. Language is remembered in `localStorage` and detected from the browser on first visit. |
+| **Custom lightweight UI strings** | A ~40-line context (`src/i18n/`) drives interface string management. UI strings live in `src/i18n/ui.js`; content is static in `src/data/*`. |
 | **No UI kit / icon package** | The look is original. Icons are a small inline SVG set (`src/components/Icon.jsx`); all imagery is CSS/SVG-based (see `HeroScene.jsx`), so there are **no copyrighted or external assets** and nothing to lazy-load incorrectly. |
 
 Fonts (Manrope + Inter) load from Google Fonts. Motion (reveal-on-scroll,
@@ -71,31 +71,28 @@ korrente/
 │   ├── main.jsx              # app entry + router provider
 │   ├── App.jsx               # route table
 │   ├── index.css             # ⭐ DESIGN TOKENS + base styles + utilities
-│   ├── i18n/                 # ⭐ LANGUAGES (EN / TR)
-│   │   ├── index.jsx         #   provider + useI18n() hook (t, pick, setLang)
-│   │   └── ui.js             #   all interface microcopy, per language
-│   ├── data/                 # ⭐ EDITABLE CONTENT (bilingual: { en, tr })
-│   │   ├── site.js           #   company details, nav, socials, footer, legal
+│   ├── i18n/                 # ⭐ INTERFACE STRINGS
+│   │   ├── index.jsx         #   provider + useI18n() hook (t, pick)
+│   │   └── ui.js             #   all interface microcopy
+│   ├── data/                 # ⭐ EDITABLE CONTENT
+│   │   ├── site.js           #   company details, nav, footer, legal
 │   │   ├── services.js       #   the six solutions/services
 │   │   ├── calculatorConfig.js # Revenue calculator defaults
-│   │   └── content.js        #   values, stats, testimonials, team,
-│   │                         #   commitments, articles, projects, roles (fallback data)
+│   │   └── content.js        #   values, stats, testimonials,
+│   │                         #   commitments, articles, projects (fallback data)
 │   ├── lib/
 │   │   ├── calculator.js     #   Revenue calculator pure math functions
-│   │   └── strapi.js         #   Strapi fetch helpers (articles, projects, roles)
+│   │   └── strapi.js         #   Strapi fetch helpers (articles, projects)
 │   ├── components/           # reusable UI (Header, Footer, Button, Reveal,
-│   │                         #   Counter, Icon, HeroScene, LanguageSwitcher…)
+│   │                         #   Counter, Icon, HeroScene…)
 │   └── pages/                # one folder-mate .jsx + .css per page
 │       ├── Home.jsx / .css
 │       ├── Solutions.jsx / .css
 │       ├── Technology.jsx / .css
 │       ├── Projects.jsx / .css
 │       ├── ProjectDetail.jsx / .css
-│       ├── About.jsx / .css       (nav label: “Company”)
 │       ├── News.jsx / .css
 │       ├── ArticleDetail.jsx / .css
-│       ├── Careers.jsx / .css
-│       ├── CareerDetail.jsx / .css
 │       ├── Sustainability.jsx / .css
 │       ├── Contact.jsx / .css
 │       ├── Calculator.jsx / .css
@@ -107,8 +104,8 @@ korrente/
 
 ## CMS integration (Strapi)
 
-Three content types are CMS-driven: **Articles** (News), **Projects**
-(Projects), and **Roles** (Careers). Set `VITE_STRAPI_URL` in `.env` to your
+Two content types are CMS-driven: **Articles** (News) and **Projects**
+(Projects). Set `VITE_STRAPI_URL` in `.env` to your
 Strapi instance's base URL (see `.env.example`):
 
 ```bash
@@ -116,11 +113,10 @@ VITE_STRAPI_URL=https://YOUR-PROJECT.strapiapp.com
 ```
 
 `src/lib/strapi.js` fetches from `${VITE_STRAPI_URL}/api/...` and maps Strapi
-5's flattened response (`documentId` + per-locale fields like `titleEn` /
-`titleTr`) back into the same bilingual shapes (`{ en, tr }`) the pages already
+5's flattened response (`documentId` + fields like `titleEn`) back into the shapes the pages already
 expect from `src/data/content.js`.
 
-Each of `News.jsx`, `Projects.jsx`, and `Careers.jsx` initializes its state
+Each of `News.jsx` and `Projects.jsx` initializes its state
 from the static array in `src/data/content.js`, then fetches from Strapi in a
 `useEffect`. If the request fails (unset `VITE_STRAPI_URL`, network error, CMS
 down), it logs a `console.warn` and keeps rendering the static fallback — the
@@ -186,31 +182,20 @@ disclaimer notes this is an illustrative model, not investment advice.
 Copy lives in two places: **`src/data/`** (page content) and **`src/i18n/ui.js`**
 (interface labels). Save the file and the dev server refreshes instantly.
 
-**Everything is bilingual.** Content fields are objects like
-`{ en: 'Hello', tr: 'Merhaba' }` — just edit the language you need (keep both
-keys). Interface strings in `ui.js` are grouped as `en: { … }` and `tr: { … }`.
+Interface strings in `ui.js` are grouped in `ui.en`.
 
 | To change… | Edit this file |
 | --- | --- |
 | Company name, email, phone, address | `src/data/site.js` → `company` |
-| Header / footer navigation links (labels are `{ en, tr }`) | `src/data/site.js` → `navLinks`, `footerNav` |
-| Social media links | `src/data/site.js` → `socials` |
+| Header / footer navigation links | `src/data/site.js` → `navLinks`, `footerNav` |
 | The six solutions (titles, descriptions, bullets, metrics) | `src/data/services.js` |
 | "Why Korrente" value props | `src/data/content.js` → `values` |
 | Impact stat counters (numbers + labels) | `src/data/content.js` → `stats` |
 | Testimonials | `src/data/content.js` → `testimonials` |
-| About-page leadership team | `src/data/content.js` → `team` |
 | Revenue Calculator defaults (prices, CAPEX, limits) | `src/data/calculatorConfig.js` |
 | Sustainability commitments | `src/data/content.js` → `commitments` |
 | Insights / news articles | `src/data/content.js` → `articles` |
 | Hero headline, buttons, nav, all UI labels, form errors | `src/i18n/ui.js` |
-
-### Languages (EN / TR)
-
-The header (and mobile menu) has a live **EN / TR** switch. To add a third
-language, add its code to `LANGUAGES` in `src/i18n/index.jsx`, add a matching
-block to `src/i18n/ui.js`, and add the key to each `{ en, tr }` field in
-`src/data/*`.
 
 ### Changing brand colours, fonts, and spacing
 
