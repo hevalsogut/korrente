@@ -46,7 +46,8 @@ export const ui = {
       scene: {
         wind: 'Wind',
         solar: 'Solar',
-        bess: 'Korrente BESS'
+        bess: 'Korrente BESS',
+        grid: 'Grid'
       },
       features: [
         { title: 'Grid-scale storage', body: 'High-performance battery systems for utility and industry.' },

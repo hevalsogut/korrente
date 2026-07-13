@@ -55,6 +55,28 @@
   width: 100%;
 }
 
+/* Desktop: the scene breaks out of its grid column and fills the right
+   side of the hero, bleeding to the viewport edge (the copy keeps its
+   column and sits above it). */
+@media (min-width: 901px) {
+  .hero__visual {
+    /* top/bottom + flex centering (not translateY) — the Reveal
+       wrapper animates `transform` on this element */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: calc((100% - 100vw) / 2);
+    width: min(58vw, 980px);
+    display: flex;
+    align-items: center;
+    z-index: 0;
+  }
+  .hero__content {
+    position: relative;
+    z-index: 1;
+  }
+}
+
 /* Feature row */
 .hero__features {
   position: relative;

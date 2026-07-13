@@ -88,7 +88,9 @@ function Flow({ id, d, from, to, dur }) {
           <stop offset="1" stopColor="#9BFFC4" stopOpacity="0.95" />
         </linearGradient>
       </defs>
-      <path d={d} fill="none" stroke={`url(#hsF-${id})`} strokeWidth="6" strokeLinecap="round" opacity="0.12" />
+      <path className="hs-flow__base" d={d} pathLength="1" fill="none" stroke={`url(#hsF-${id})`} strokeWidth="6" strokeLinecap="round" />
+      {/* leader — draws the route in during the load sequence, then dims */}
+      <path className="hs-flow__lead" d={d} pathLength="1" fill="none" stroke="#7CFFB0" strokeWidth="2" strokeLinecap="round" />
       <path className="hs-flow__dash" d={d} fill="none" stroke={`url(#hsF-${id})`} strokeWidth="2.6" strokeLinecap="round" />
       <circle className="hs-flow__pulse" r="3.6" fill="#9BFFC4">
         <animateMotion dur={dur} repeatCount="indefinite" path={d} />
@@ -96,7 +98,40 @@ function Flow({ id, d, from, to, dur }) {
       <circle className="hs-flow__pulse" r="2.4" fill="#7CFFB0">
         <animateMotion dur={dur} begin={`-${parseFloat(dur) / 2}s`} repeatCount="indefinite" path={d} />
       </circle>
-      <circle cx={from[0]} cy={from[1]} r="2.6" fill="#3BE07A" opacity="0.6" />
+      <circle className="hs-flow__src" cx={from[0]} cy={from[1]} r="2.6" fill="#3BE07A" />
+    </g>
+  )
+}
+
+/* Lattice transmission tower, authored around base centre (733,452),
+   top at y≈196. Instances place it with translate+scale — smaller and
+   dimmer with distance. */
+function PylonShape() {
+  return (
+    <g>
+      <g stroke="rgba(155,255,196,0.45)" strokeWidth="1.3" fill="none">
+        {/* legs + mast */}
+        <path d="M716 452 L728 210 M750 452 L738 210 M728 210 L733 196 L738 210" />
+        {/* horizontal braces */}
+        <path d="M718.4 400 H747.6 M720.4 360 H745.6 M722.4 320 H743.6 M724.4 280 H741.6 M726.4 244 H739.6" opacity="0.8" />
+      </g>
+      {/* lattice zigzag */}
+      <g stroke="rgba(155,255,196,0.25)" strokeWidth="1" fill="none">
+        <path d="M718.4 400 L745.6 360 L720.4 360 L743.6 320 L722.4 320 L741.6 280 L724.4 280 L739.6 244" />
+      </g>
+      {/* crossarms + insulators */}
+      <g stroke="rgba(155,255,196,0.5)" strokeWidth="1.6" fill="none">
+        <path d="M708 240 H758 M714 274 H752" />
+      </g>
+      <g stroke="rgba(155,255,196,0.4)" strokeWidth="1.2">
+        <path d="M712 240 V252 M754 240 V252 M718 274 V286 M748 274 V286" />
+      </g>
+      <g fill="#7CFFB0" opacity="0.8">
+        <circle cx="712" cy="253" r="1.6" />
+        <circle cx="754" cy="253" r="1.6" />
+        <circle cx="718" cy="287" r="1.6" />
+        <circle cx="748" cy="287" r="1.6" />
+      </g>
     </g>
   )
 }
@@ -225,6 +260,10 @@ export default function HeroScene() {
             <stop offset="0.5" stopColor="#47A257" stopOpacity="0.35" />
             <stop offset="1" stopColor="#47A257" stopOpacity="0" />
           </linearGradient>
+          <linearGradient id="hsWire" gradientUnits="userSpaceOnUse" x1="730" y1="0" x2="766" y2="0">
+            <stop offset="0" stopColor="#9BFFC4" stopOpacity="0.55" />
+            <stop offset="1" stopColor="#9BFFC4" stopOpacity="0" />
+          </linearGradient>
           <linearGradient id="hsReflFade" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#fff" stopOpacity="0.28" />
             <stop offset="0.8" stopColor="#fff" stopOpacity="0" />
@@ -236,10 +275,10 @@ export default function HeroScene() {
 
         {/* ================= BACK LAYER: sky + wind ================= */}
         <g className="hs-layer hs-layer--back">
-          <ellipse cx="470" cy="290" rx="330" ry="260" fill="url(#hsGlow)" />
+          <ellipse className="hs-enter-fade" cx="470" cy="290" rx="330" ry="260" fill="url(#hsGlow)" />
 
           {/* stars / dust */}
-          <g fill="#5CF29A">
+          <g className="hs-enter-fade" fill="#5CF29A">
             <circle className="hs-star" cx="180" cy="70" r="1.6" opacity="0.5" />
             <circle cx="340" cy="45" r="1.2" opacity="0.3" />
             <circle className="hs-star hs-star--slow" cx="600" cy="60" r="1.8" opacity="0.5" />
@@ -248,24 +287,71 @@ export default function HeroScene() {
           </g>
 
           {/* wind farm on the back-left rise */}
-          <g className="hs-sys hs-sys--wind">
+          <g className="hs-sys hs-sys--wind hs-enter hs-enter--wind">
             <Turbine hub={[95, 200]} base={415} r={66} rotorClass="hs-rotor--a" />
             <Turbine hub={[205, 240]} base={402} r={48} rotorClass="hs-rotor--b" dim={0.72} />
             <Turbine hub={[283, 268]} base={392} r={35} rotorClass="hs-rotor--c" dim={0.5} />
             <Chip x={120} y={120} w={96} label={t('home.scene.wind')} />
+          </g>
+
+          {/* wind gusts drifting through the rotors — the input */}
+          <g className="hs-enter-fade hs-enter--wind" fill="none" stroke="rgba(124,255,176,0.35)" strokeWidth="1.4" strokeLinecap="round">
+            <path className="hs-gust hs-gust--a" d="M 20 208 C 90 198, 150 214, 235 204" />
+            <path className="hs-gust hs-gust--b" d="M 34 262 C 110 252, 180 268, 262 256" />
+          </g>
+
+          {/* ---- the grid: a transmission line receding across the
+                 background sky on a distant ridge — the last step of the
+                 flow, wallpapered behind the battery. Back layer, so the
+                 parallax pushes it deeper than everything else. ---- */}
+          <g className="hs-sys hs-sys--grid hs-enter hs-enter--grid">
+            {/* distant ridge the towers stand on — right background only */}
+            <path
+              d="M 460 431 C 500 408, 520 380, 545 350 C 560 330, 575 315, 590 312 C 620 308, 640 316, 660 321 C 688 328, 700 333, 716 338 C 735 343, 748 346, 760 345 L 760 431 Z"
+              fill="#0C1710"
+              opacity="0.9"
+            />
+            <path
+              d="M 460 431 C 500 408, 520 380, 545 350 C 560 330, 575 315, 590 312 C 620 308, 640 316, 660 321 C 688 328, 700 333, 716 338 C 735 343, 748 346, 760 345"
+              fill="none"
+              stroke="rgba(107,194,111,0.18)"
+              strokeWidth="1"
+            />
+
+            {/* three pylons, nearest → farthest */}
+            <g transform="translate(312.85 89.4) scale(0.55)" opacity="0.85"><PylonShape /></g>
+            <g transform="translate(273.5 94) scale(0.5)" opacity="0.6"><PylonShape /></g>
+            <g transform="translate(296.8 131.2) scale(0.4)" opacity="0.45"><PylonShape /></g>
+            <circle className="hs-blink" cx="716" cy="193" r="1.7" fill="#9BFFC4" />
+
+            {/* catenaries linking the towers, then leaving the frame */}
+            <g fill="none" stroke="rgba(155,255,196,0.28)" strokeWidth="1.1">
+              <path d="M 600 227.2 C 610 230, 620 220, 627.5 214" />
+              <path d="M 652.5 214 C 668 222, 686 224, 702.3 221.4" />
+              <path d="M 580 227.2 C 570 231, 560 233, 550 234" opacity="0.5" />
+            </g>
+            <path d="M 729.8 221.4 C 742 227, 754 230, 768 231" fill="none" stroke="url(#hsWire)" strokeWidth="1.1" />
+
+            <Chip x={700} y={172} w={76} label={t('home.scene.grid')} />
           </g>
         </g>
 
         {/* ================= MID LAYER: ground + container + flows ================= */}
         <g className="hs-layer hs-layer--mid">
           {/* horizon + receding ground lines */}
-          <rect x="30" y="431" width="700" height="1.5" fill="url(#hsHorizon)" />
-          <g stroke="#47A257" strokeWidth="1">
-            <path d="M60 460 H710" opacity="0.07" />
-            <path d="M30 495 H730" opacity="0.055" />
-            <path d="M55 535 H705" opacity="0.04" />
+          <g className="hs-enter-fade">
+            <rect x="30" y="431" width="700" height="1.5" fill="url(#hsHorizon)" />
+            <g stroke="#47A257" strokeWidth="1">
+              <path d="M60 460 H710" opacity="0.07" />
+              <path d="M30 495 H730" opacity="0.055" />
+              <path d="M55 535 H705" opacity="0.04" />
+            </g>
           </g>
 
+          {/* Container complex, shifted left to make room for the grid
+              pylon on the right. Ports keep their local door coords. */}
+          <g transform="translate(-58 4)">
+          <g className="hs-enter hs-enter--bess">
           {/* glow pool + reflection under the container */}
           <ellipse cx="586" cy="458" rx="200" ry="28" fill="url(#hsPool)" />
           <g mask="url(#hsReflMask)" opacity="0.35">
@@ -341,16 +427,22 @@ export default function HeroScene() {
             <Chip x={586} y={190} w={150} label={t('home.scene.bess')} />
           </g>
 
-          {/* energy flows into the door ports */}
-          <Flow id="wind" d="M 128 428 C 240 474, 345 452, 437 380" from={[128, 428]} to={[437, 380]} dur="4.4s" />
-          <Flow id="solar" d="M 336 505 C 388 514, 416 470, 442 414" from={[336, 505]} to={[442, 414]} dur="3.6s" />
           <Port x={437} y={379} />
           <Port x={442} y={413} />
+          </g>
+          </g>
+
+          {/* energy flows into the door ports (post-shift coords) */}
+          <Flow id="wind" d="M 128 428 C 240 474, 340 452, 379 383" from={[128, 428]} to={[379, 383]} dur="4.4s" />
+          <Flow id="solar" d="M 336 505 C 368 512, 388 468, 384 417" from={[336, 505]} to={[384, 417]} dur="3.6s" />
+
+          {/* outgoing flow — climbs from the container to the nearest tower */}
+          <Flow id="grid" d="M 694 396 C 706 388, 712 366, 716 341" from={[694, 396]} to={[716, 341]} dur="3.9s" />
         </g>
 
         {/* ================= FRONT LAYER: solar array + fog ================= */}
         <g className="hs-layer hs-layer--front">
-          <g className="hs-sys hs-sys--solar">
+          <g className="hs-sys hs-sys--solar hs-enter hs-enter--solar">
             <ellipse cx="190" cy="543" rx="150" ry="9" fill="#000" opacity="0.4" />
             {/* back row, dimmer */}
             <g transform="translate(96 452) skewX(-16) scale(0.9)" opacity="0.62">
@@ -368,11 +460,21 @@ export default function HeroScene() {
             <g stroke="rgba(107,194,111,0.5)" strokeWidth="1.6">
               <path d="M78 532 V545 M132 532 V545 M200 532 V545 M268 532 V545" />
             </g>
-            <Chip x={185} y={452} w={100} label={t('home.scene.solar')} />
+            <Chip x={200} y={424} w={100} label={t('home.scene.solar')} />
           </g>
 
-          <ellipse className="hs-fog hs-fog--a" cx="210" cy="472" rx="230" ry="36" fill="url(#hsFog)" />
-          <ellipse className="hs-fog hs-fog--b" cx="620" cy="486" rx="240" ry="40" fill="url(#hsFog)" />
+          {/* sunlight motes landing on the glass — the input */}
+          <g className="hs-enter-fade hs-enter--solar" stroke="#7CFFB0" strokeWidth="1.6" strokeLinecap="round">
+            <g transform="translate(122 500)"><g className="hs-photon"><line x1="-8" y1="-15" x2="0" y2="0" /></g></g>
+            <g transform="translate(175 522)"><g className="hs-photon hs-photon--2"><line x1="-8" y1="-15" x2="0" y2="0" /></g></g>
+            <g transform="translate(226 505)"><g className="hs-photon hs-photon--3"><line x1="-8" y1="-15" x2="0" y2="0" /></g></g>
+            <g transform="translate(258 528)"><g className="hs-photon hs-photon--4"><line x1="-8" y1="-15" x2="0" y2="0" /></g></g>
+          </g>
+
+          <g className="hs-enter-fade">
+            <ellipse className="hs-fog hs-fog--a" cx="210" cy="472" rx="230" ry="36" fill="url(#hsFog)" />
+            <ellipse className="hs-fog hs-fog--b" cx="620" cy="486" rx="240" ry="40" fill="url(#hsFog)" />
+          </g>
         </g>
       </svg>
     </div>
