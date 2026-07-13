@@ -10,14 +10,11 @@ export default function Logo({ tone = 'light', withText = true }) {
   return (
     <Link to="/" className="logo" aria-label="Korrente — home">
       <svg className="logo__mark" width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
-        <rect x="15" y="4" width="10" height="5" rx="1.5" fill="#47A257" />
-        <rect x="8" y="8" width="24" height="29" rx="6" fill="#47A257" />
+        <rect x="0" y="0" width="3.11" height="40" fill="#5BB56A" />
+        <rect x="6.22" y="0" width="33.78" height="40" fill="#5BB56A" />
         <path
-          d="M22 11 14 23h5l-2 11 9-14h-5.5z"
+          d="M10.59 38.34 35.33 24.89 34.96 23.37 29.08 19.4 28.05 17.5 36.23 4.13 36.52 1.73 34.27 2.24 10.84 15.11 11.26 16.69 17.34 20.82 18.2 22.5 9.81 36.34 9.45 37.94Z"
           fill="#fff"
-          stroke="#fff"
-          strokeWidth="0.5"
-          strokeLinejoin="round"
         />
       </svg>
       {withText && (

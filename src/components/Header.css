@@ -31,7 +31,6 @@
   flex-shrink: 0;
 }
 .logo__mark {
-  border-radius: 10px;
   transition: transform var(--dur) var(--ease-out);
 }
 .logo:hover .logo__mark {
