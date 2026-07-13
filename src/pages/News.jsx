@@ -36,18 +36,17 @@ export default function News() {
       'Perspectives from Korrente on the energy transition — firm renewables, storage, grid reform, policy, and the technology that makes clean power dependable.'
   }
 
-  // Categories keyed by the stable English value so filtering survives language switches.
   const categories = [
     { key: ALL, label: t('news.all') },
     ...articles.reduce((acc, a) => {
-      if (!acc.some((c) => c.key === a.category.en)) acc.push({ key: a.category.en, label: pick(a.category) })
+      if (!acc.some((c) => c.key === a.category)) acc.push({ key: a.category, label: a.category })
       return acc
     }, [])
   ]
 
   const featured = articles.find((a) => a.featured) || articles[0]
   const rest = articles.filter((a) => a.id !== featured.id)
-  const visible = filter === ALL ? rest : rest.filter((a) => a.category.en === filter)
+  const visible = filter === ALL ? rest : rest.filter((a) => a.category === filter)
 
   return (
     <>
