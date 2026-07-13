@@ -287,6 +287,19 @@ export default function Calculator() {
   const lcosLabel = results.lifecycle.lcos_eur_per_mwh != null ? `${fmtCurrency(lang, results.lifecycle.lcos_eur_per_mwh, 0)}/MWh` : '—'
   const spreadLabel = `${fmtCurrency(lang, results.lifecycle.captured_spread_eur_per_mwh, 0)}/MWh`
 
+  // Simple (undiscounted) lifetime profit: every year's net cashflow,
+  // minus the upfront CAPEX. Sits next to NPV so the "simple total" vs
+  // "discounted, finance-grade" framing is visible side by side.
+  const lifetimeNetProfitEur = results.lifecycle.years.reduce((sum, y) => sum + y.net_eur, 0) - results.capex_eur
+  const lifetimeProfitLabel = t('calculator.lifecycle.lifetimeProfit').replace(
+    '{years}',
+    fmtNumber(lang, Number(inputs.project_life_years), 0)
+  )
+  const npvTodayNote = t('calculator.lifecycle.npvTodayNote').replace(
+    '{rate}',
+    fmtNumber(lang, Number(inputs.discount_rate_pct), 1)
+  )
+
   return (
     <>
       <Seo title={seo.title} description={seo.description} path="/calculator" />
@@ -589,6 +602,24 @@ export default function Calculator() {
             {/* Lifetime economics */}
             <div className="calc-subsection">
               <h3 className="h4">{t('calculator.lifecycle.sectionTitle')}</h3>
+
+              <div className="calc-results__grid">
+                <div className="calc-card">
+                  <span className="calc-card__label">{lifetimeProfitLabel}</span>
+                  <span className={`calc-card__value ${lifetimeNetProfitEur < 0 ? 'calc-card__value--negative' : ''}`}>
+                    {fmtCurrency(lang, lifetimeNetProfitEur, 0)}
+                  </span>
+                </div>
+                <div className="calc-card">
+                  <span className="calc-card__label">{t('calculator.lifecycle.npvToday')}</span>
+                  <span className={`calc-card__value ${results.lifecycle.npv_eur < 0 ? 'calc-card__value--negative' : ''}`}>
+                    {fmtCurrency(lang, results.lifecycle.npv_eur, 0)}
+                  </span>
+                </div>
+              </div>
+              <p className="calc-field__help">{t('calculator.lifecycle.lifetimeProfitNote')}</p>
+              <p className="calc-field__help">{npvTodayNote}</p>
+
               <div className="calc-results__grid">
                 <div className="calc-card">
                   <span className="calc-card__label">{t('calculator.lifecycle.lcos')}</span>

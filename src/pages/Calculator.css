@@ -267,6 +267,9 @@
   font-weight: 600;
   color: var(--text-on-light-muted);
 }
+.calc-card__value--negative {
+  color: #c23434;
+}
 
 .calc-disclaimer {
   font-size: var(--step--1);

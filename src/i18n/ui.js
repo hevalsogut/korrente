@@ -346,6 +346,12 @@ export const ui = {
       },
       lifecycle: {
         sectionTitle: 'Lifetime economics',
+        lifetimeProfit: 'Lifetime net profit ({years} yr)',
+        lifetimeProfitNote:
+          'Estimated total earnings over the project life after CAPEX and running costs. An estimate based on the assumptions above — actual results depend on real market prices.',
+        npvToday: "In today's money (NPV)",
+        npvTodayNote:
+          "Same profit expressed in today's money, using a {rate}% discount rate — the more conservative, finance-grade figure.",
         lcos: 'Levelised cost of storage (LCOS)',
         npv: 'Net present value (NPV)',
         viable: 'Viable on arbitrage alone at current assumptions.',
@@ -751,6 +757,12 @@ export const ui = {
       },
       lifecycle: {
         sectionTitle: 'Yaşam döngüsü ekonomisi',
+        lifetimeProfit: 'Yaşam boyu net kâr ({years} yıl)',
+        lifetimeProfitNote:
+          'Proje ömrü boyunca CAPEX ve işletme giderleri düşüldükten sonra tahmini toplam kazanç. Yukarıdaki varsayımlara dayalı bir tahmindir — gerçek sonuçlar piyasa fiyatlarına bağlıdır.',
+        npvToday: 'Bugünün parasıyla (NPV)',
+        npvTodayNote:
+          'Aynı kârın bugünün parasıyla ifadesi, %{rate} iskonto oranı kullanılarak — daha muhafazakâr, finans sınıfı rakam.',
         lcos: 'Seviyelendirilmiş depolama maliyeti (LCOS)',
         npv: 'Net bugünkü değer (NPV)',
         viable: 'Mevcut varsayımlarla yalnızca arbitrajla uygun.',
