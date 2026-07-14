@@ -368,6 +368,216 @@ assert(
   c10SolarResult.lifecycle.years[0].energy_discharged_mwh
 );
 
+// ============================================================
+// GROUPS F — Vanadium Flow chemistry preset
+// Mirrors the lithium/mode coverage above. Every expected value below
+// is derived independently from the model's stated equations and the
+// ACTUAL config values (never by reading calculator.js's
+// implementation) — a mismatch is a genuine finding, not assumed to
+// be a test bug.
+// ============================================================
+
+// --- Confirm preset values first (raw config, not calc output) ---
+const lithiumPreset = config.CHEMISTRY_PRESETS.lithium;
+const flowPreset = config.CHEMISTRY_PRESETS.flow;
+
+assert(
+  flowPreset.rte_by_duration[1] === 0.7 && flowPreset.rte_by_duration[2] === 0.7 && flowPreset.rte_by_duration[4] === 0.7,
+  'Preset check: Flow RTE flat 0.70 across all durations',
+  '{1:0.7,2:0.7,4:0.7}',
+  JSON.stringify(flowPreset.rte_by_duration)
+);
+assert(flowPreset.dod_pct === 100, 'Preset check: Flow dod_pct', 100, flowPreset.dod_pct);
+assert(flowPreset.capex_energy_eur_kwh === 400, 'Preset check: Flow capex_energy_eur_kwh', 400, flowPreset.capex_energy_eur_kwh);
+assert(flowPreset.project_life_years === 25, 'Preset check: Flow project_life_years', 25, flowPreset.project_life_years);
+assert(flowPreset.calendar_degradation_pct_yr === 0.45, 'Preset check: Flow calendar_degradation_pct_yr', 0.45, flowPreset.calendar_degradation_pct_yr);
+assert(flowPreset.degradation_per_full_cycle_pct === 0.000137, 'Preset check: Flow degradation_per_full_cycle_pct', 0.000137, flowPreset.degradation_per_full_cycle_pct);
+
+assert(
+  lithiumPreset.rte_by_duration[1] === 0.82 && lithiumPreset.rte_by_duration[2] === 0.87 && lithiumPreset.rte_by_duration[4] === 0.9,
+  'Preset check: Lithium RTE unchanged {1:0.82,2:0.87,4:0.90}',
+  '{1:0.82,2:0.87,4:0.9}',
+  JSON.stringify(lithiumPreset.rte_by_duration)
+);
+assert(lithiumPreset.dod_pct === 90, 'Preset check: Lithium dod_pct unchanged', 90, lithiumPreset.dod_pct);
+assert(lithiumPreset.capex_energy_eur_kwh === 220, 'Preset check: Lithium capex_energy_eur_kwh unchanged', 220, lithiumPreset.capex_energy_eur_kwh);
+assert(lithiumPreset.project_life_years === 15, 'Preset check: Lithium project_life_years unchanged', 15, lithiumPreset.project_life_years);
+
+// Downstream expected-value math reads the ACTUAL config values (cfgFlow),
+// not the hardcoded constants above — a real config drift is reported once
+// (the preset checks above), not cascaded into every downstream assertion.
+const cfgFlow = {
+  rte: flowPreset.rte_by_duration[2],
+  dod: flowPreset.dod_pct,
+  capex_energy: flowPreset.capex_energy_eur_kwh,
+  life: flowPreset.project_life_years,
+  calendar_deg: flowPreset.calendar_degradation_pct_yr,
+  percycle_deg: flowPreset.degradation_per_full_cycle_pct
+};
+
+// Simulates the exact merge Calculator.jsx's updateChemistry() performs
+// when the user picks "Vanadium Flow" — loads the preset's six fields
+// on top of the same grid-mode baseline inputs Group 1 uses (100MW, 2h,
+// spread 130, cycles 365), so flow vs lithium is an apples-to-apples
+// comparison against g1Result.
+const flowInputs = {
+  ...defaultInputs,
+  rte_by_duration: flowPreset.rte_by_duration,
+  dod_pct: cfgFlow.dod,
+  capex_energy_eur_kwh: cfgFlow.capex_energy,
+  project_life_years: cfgFlow.life,
+  degradation_per_full_cycle_pct: cfgFlow.percycle_deg,
+  calendar_degradation_pct_yr: cfgFlow.calendar_deg
+};
+const flowResult = calculateRevenue(flowInputs);
+
+const flowSolarInputs = {
+  ...flowInputs,
+  mode: 'solar',
+  pv_size_mwp: config.SOLAR_DEFAULTS.pv_size_mwp,
+  solar_capex_eur_per_kwp: config.SOLAR_DEFAULTS.solar_capex_eur_per_kwp
+};
+const flowSolarResult = calculateRevenue(flowSolarInputs);
+
+// --- GROUP F1: preset wiring — the six preset values actually reach the engine ---
+assert(flowResult.rte === cfgFlow.rte, 'F1: Flow RTE (0.70) reaches the engine via the rte_by_duration override', cfgFlow.rte, flowResult.rte);
+assertClose(flowResult.E_use_mwh, flowResult.E_nom_mwh, 0.001, 'F1: Flow dod_pct (100) reaches the engine -> E_use == E_nom (usable == nameplate, unlike lithium)');
+const f1ExpectedCapexDeltaVsLithium = (cfgFlow.capex_energy - cfg.capex_energy) * E_nom * 1000; // same power/duration as Group 1
+assertClose(
+  flowResult.capex_eur - g1Result.capex_eur,
+  f1ExpectedCapexDeltaVsLithium,
+  1,
+  'F1: Flow capex_energy_eur_kwh (400) reaches the engine (CAPEX delta vs lithium == (400-220)*E_nom*1000)'
+);
+assert(flowResult.lifecycle.years.length === cfgFlow.life, 'F1: Flow project_life_years (25) reaches the engine (25 per-year rows)', cfgFlow.life, flowResult.lifecycle.years.length);
+assertClose(
+  flowResult.degradation.annual_loss_pct,
+  cfgFlow.calendar_deg + cfg.cycles * cfgFlow.percycle_deg,
+  0.01,
+  'F1: Flow degradation terms (calendar + per-cycle) reach the engine'
+);
+
+// --- GROUP F2: arithmetic (grid, 100MW, 2h, flow preset, spread 130, cycles 365) ---
+const f2ExpectedEUse = E_nom * (cfgFlow.dod / 100); // E_nom shared with Group 1 (same power/duration)
+assertClose(flowResult.E_nom_mwh, E_nom, 0.1, 'F2: E_nom unaffected by chemistry (100 x 2h = 200 MWh)');
+assertClose(flowResult.E_use_mwh, f2ExpectedEUse, 0.1, 'F2: E_use = E_nom * dod(100%) = 200 MWh');
+const f2ExpectedCapex = cfg.power * 1000 * cfg.capex_power + E_nom * 1000 * cfgFlow.capex_energy;
+assertClose(flowResult.capex_eur, f2ExpectedCapex, 1, 'F2: CAPEX = power*1000*capex_power + E_nom*1000*capex_energy(400) = 85.5M');
+const f2ExpectedCapexPerKwh = f2ExpectedCapex / (E_nom * 1000);
+assertClose(flowResult.capex_per_kwh, f2ExpectedCapexPerKwh, 0.01, 'F2: capex_per_kwh = CAPEX / (E_nom*1000) ~= 428');
+const f2ExpectedAnnualGross = f2ExpectedEUse * cfg.cycles * cfg.price_spread * cfgFlow.rte;
+assertClose(flowResult.annual_gross_eur, f2ExpectedAnnualGross, 1, 'F2: Annual gross = E_use * cycles * spread * rte(0.70) = 6,643,000');
+const f2ExpectedOpex = f2ExpectedCapex * (cfg.opex / 100);
+const f2ExpectedNet = f2ExpectedAnnualGross - f2ExpectedOpex;
+const f2ExpectedPayback = f2ExpectedNet > 0 ? f2ExpectedCapex / f2ExpectedNet : null;
+assertClose(flowResult.annual_net_eur, f2ExpectedNet, 1, 'F2: Year-1 net = gross - opex');
+assertClose(flowResult.payback_years, f2ExpectedPayback, 0.1, 'F2: Payback == CAPEX / annual_net');
+console.log(`   [F2 report] Flow grid payback=${flowResult.payback_years?.toFixed(2)}yr (independently expected ${f2ExpectedPayback?.toFixed(2)}yr)`);
+
+// --- GROUP F3: degradation physics (the calendar-dominated fix) — lock it ---
+const f3ExpectedAnnualLoss = cfgFlow.calendar_deg + cfg.cycles * cfgFlow.percycle_deg; // 0.45 + 365*0.000137
+assertClose(flowResult.degradation.annual_loss_pct, f3ExpectedAnnualLoss, 0.02, 'F3: Flow total annual SoH loss matches calendar + per-cycle formula');
+assertClose(flowResult.degradation.annual_loss_pct, 0.5, 0.05, 'F3: Flow annual loss lands at ~0.5%/yr (spec target)');
+
+// CRITICAL: cycling-invariance. highCycleResult (Group 4, cycles=700,
+// lithium/default life=15) is reused as the lithium comparison point.
+const flow700Inputs = { ...flowInputs, cycles_per_year: 700 };
+const flow700Result = calculateRevenue(flow700Inputs);
+const flowSohDrop = flowResult.degradation.soh_end_of_life_pct - flow700Result.degradation.soh_end_of_life_pct;
+const lithiumSohDrop = g1Result.degradation.soh_end_of_life_pct - highCycleResult.degradation.soh_end_of_life_pct;
+console.log(
+  `   [F3 report] SoH@EOL drop, 365->700 cycles/yr: Flow=${flowSohDrop.toFixed(2)}pp (25yr life) | Lithium=${lithiumSohDrop.toFixed(2)}pp (15yr life) | lithium/flow ratio=${(lithiumSohDrop / flowSohDrop).toFixed(1)}x`
+);
+assert(flowSohDrop <= 1.5, 'F3: CRITICAL - Flow SoH@EOL drop (365->700 cyc/yr) stays small (calendar-dominated, <=1.5pp)', '<= 1.5pp', flowSohDrop.toFixed(2));
+assert(lithiumSohDrop >= 10, 'F3: Lithium SoH@EOL drop (365->700 cyc/yr) is large (cycle-dominated, >=10pp)', '>= 10pp', lithiumSohDrop.toFixed(2));
+assert(
+  lithiumSohDrop >= flowSohDrop * 5,
+  'F3: CRITICAL - Flow durability advantage invariant: lithium drop >= 5x flow drop',
+  `>= ${(flowSohDrop * 5).toFixed(2)}pp`,
+  lithiumSohDrop.toFixed(2)
+);
+
+// --- GROUP F4: cross-chemistry direction (flow vs lithium, same 100MW/2h/grid) ---
+assert(flowResult.capex_eur > g1Result.capex_eur, 'F4: Flow CAPEX > Lithium CAPEX (same power/duration)', '> lithium capex', flowResult.capex_eur);
+assert(flowResult.rte < g1Result.rte, 'F4: Flow RTE < Lithium RTE', `< ${g1Result.rte}`, flowResult.rte);
+assert(cfgFlow.life > cfg.life, 'F4: Flow project_life_years (config) > Lithium', `> ${cfg.life}`, cfgFlow.life);
+assert(flowResult.lifecycle.years.length > g1Result.lifecycle.years.length, 'F4: Flow lifecycle rows (25) > Lithium (15)', '> 15', flowResult.lifecycle.years.length);
+assert(flowResult.payback_years > g1Result.payback_years, 'F4: Flow payback > Lithium payback (grid mode)', `> ${g1Result.payback_years.toFixed(2)}`, flowResult.payback_years);
+assert(
+  flowResult.degradation.soh_end_of_life_pct > g1Result.degradation.soh_end_of_life_pct,
+  'F4: Flow SoH@EOL > Lithium SoH@EOL despite flow\'s longer (25yr) horizon',
+  `> ${g1Result.degradation.soh_end_of_life_pct.toFixed(1)}`,
+  flowResult.degradation.soh_end_of_life_pct
+);
+
+// --- GROUP F5: viability & scope under flow (both modes) ---
+assert(flowResult.lifecycle.npv_eur < 0, 'F5: Grid+Flow NPV < 0 (high CAPEX + low RTE, legitimate)', '< 0', flowResult.lifecycle.npv_eur.toFixed(0));
+assert(flowResult.lifecycle.viableOnArbitrage === false, 'F5: Grid+Flow not viable on arbitrage alone', false, flowResult.lifecycle.viableOnArbitrage);
+assert(
+  flowResult.lifecycle.viableOnArbitrage === (flowResult.lifecycle.captured_spread_eur_per_mwh >= flowResult.lifecycle.lcos_eur_per_mwh),
+  'F5: viableOnArbitrage flag matches captured_spread >= LCOS comparison (flow)',
+  flowResult.lifecycle.captured_spread_eur_per_mwh >= flowResult.lifecycle.lcos_eur_per_mwh,
+  flowResult.lifecycle.viableOnArbitrage
+);
+assert(flowSolarResult.lifecycle.npv_eur > 0, 'F5: Solar+Flow NPV > 0 (solar revenue base keeps flow positive)', '> 0', flowSolarResult.lifecycle.npv_eur.toFixed(0));
+assert(
+  flowResult.lifecycle.lcos_eur_per_mwh >= 120 && flowResult.lifecycle.lcos_eur_per_mwh <= 180,
+  'F5: Flow LCOS lands in NL utility-scale benchmark band (EUR120-180/MWh)',
+  '120-180',
+  flowResult.lifecycle.lcos_eur_per_mwh.toFixed(1)
+);
+
+const flowGridProfit = cardLifetimeProfit(flowResult);
+assert(flowGridProfit >= flowResult.lifecycle.npv_eur, 'F5: Ordering holds under flow (grid) - lifetime profit >= NPV', '>= NPV', flowGridProfit.toFixed(2));
+const flowSolarProfit = cardLifetimeProfit(flowSolarResult);
+assert(flowSolarProfit >= flowSolarResult.lifecycle.npv_eur, 'F5: Ordering holds under flow (solar) - lifetime profit >= NPV', '>= NPV', flowSolarProfit.toFixed(2));
+
+// Lithium BYTE-IDENTICAL: explicitly loading the lithium preset (as the
+// UI does when the chemistry select is on its default option) must
+// reproduce Group 1 / Group 5's numbers exactly — the flow feature must
+// not have perturbed lithium in either mode.
+const lithiumExplicitFields = {
+  rte_by_duration: lithiumPreset.rte_by_duration,
+  dod_pct: lithiumPreset.dod_pct,
+  capex_energy_eur_kwh: lithiumPreset.capex_energy_eur_kwh,
+  project_life_years: lithiumPreset.project_life_years,
+  degradation_per_full_cycle_pct: lithiumPreset.degradation_per_full_cycle_pct,
+  calendar_degradation_pct_yr: lithiumPreset.calendar_degradation_pct_yr
+};
+
+const lithiumExplicitResult = calculateRevenue({ ...defaultInputs, ...lithiumExplicitFields });
+assert(lithiumExplicitResult.capex_eur === g1Result.capex_eur, 'F5: Lithium preset byte-identical - grid CAPEX', g1Result.capex_eur, lithiumExplicitResult.capex_eur);
+assert(lithiumExplicitResult.annual_gross_eur === g1Result.annual_gross_eur, 'F5: Lithium preset byte-identical - grid annual gross', g1Result.annual_gross_eur, lithiumExplicitResult.annual_gross_eur);
+assert(lithiumExplicitResult.payback_years === g1Result.payback_years, 'F5: Lithium preset byte-identical - grid payback', g1Result.payback_years, lithiumExplicitResult.payback_years);
+assert(lithiumExplicitResult.lifecycle.npv_eur === g1Result.lifecycle.npv_eur, 'F5: Lithium preset byte-identical - grid NPV', g1Result.lifecycle.npv_eur, lithiumExplicitResult.lifecycle.npv_eur);
+assert(
+  lithiumExplicitResult.lifecycle.lcos_eur_per_mwh === g1Result.lifecycle.lcos_eur_per_mwh,
+  'F5: Lithium preset byte-identical - grid LCOS',
+  g1Result.lifecycle.lcos_eur_per_mwh,
+  lithiumExplicitResult.lifecycle.lcos_eur_per_mwh
+);
+
+const lithiumExplicitSolarResult = calculateRevenue({ ...solarInputs, ...lithiumExplicitFields });
+assert(lithiumExplicitSolarResult.capex_eur === solarResult.capex_eur, 'F5: Lithium preset byte-identical - solar CAPEX', solarResult.capex_eur, lithiumExplicitSolarResult.capex_eur);
+assert(
+  lithiumExplicitSolarResult.annual_gross_eur === solarResult.annual_gross_eur,
+  'F5: Lithium preset byte-identical - solar annual gross',
+  solarResult.annual_gross_eur,
+  lithiumExplicitSolarResult.annual_gross_eur
+);
+assert(
+  lithiumExplicitSolarResult.lifecycle.npv_eur === solarResult.lifecycle.npv_eur,
+  'F5: Lithium preset byte-identical - solar NPV',
+  solarResult.lifecycle.npv_eur,
+  lithiumExplicitSolarResult.lifecycle.npv_eur
+);
+assert(
+  lithiumExplicitSolarResult.lifecycle.lcos_eur_per_mwh === solarResult.lifecycle.lcos_eur_per_mwh,
+  'F5: Lithium preset byte-identical - solar LCOS',
+  solarResult.lifecycle.lcos_eur_per_mwh,
+  lithiumExplicitSolarResult.lifecycle.lcos_eur_per_mwh
+);
+
 // Print summary
 results.forEach(r => {
   if (r.status === 'PASS') {
