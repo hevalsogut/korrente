@@ -66,7 +66,11 @@ export function calculateRevenue(inputs) {
   const capex_energy_eur_kwh = clampField('capex_energy_eur_kwh', inputs.capex_energy_eur_kwh, 0)
   const opex_pct_of_capex = clampField('opex_pct_of_capex', inputs.opex_pct_of_capex, 0)
 
-  const rte = RTE_BY_DURATION[duration_h] ?? RTE_BY_DURATION[2]
+  // `rte_by_duration` is an optional override table (e.g. a chemistry
+  // preset resolved before this function was called) — defaults to
+  // the config's own table, so the engine stays chemistry-agnostic.
+  const rteTable = inputs.rte_by_duration || RTE_BY_DURATION
+  const rte = rteTable[duration_h] ?? rteTable[2] ?? RTE_BY_DURATION[2]
 
   const E_nom_mwh = power_mw * duration_h
   const E_use_mwh = E_nom_mwh * (dod_pct / 100)

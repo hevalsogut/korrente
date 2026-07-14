@@ -67,6 +67,53 @@ export const DEGRADATION_DEFAULTS = {
 }
 
 /* ------------------------------------------------------------------
+   STAGE 3 — battery chemistry presets
+   A preset is a bundle of engineering + cost defaults (RTE, DoD,
+   degradation, project life, energy CAPEX) that gets loaded into the
+   advanced fields BEFORE calculateRevenue() runs — the calculation
+   engine itself stays chemistry-agnostic (it only ever sees the
+   resulting numbers, never a "chemistry"). Loading a preset just
+   overwrites the current values of existing advanced fields, so the
+   user can still edit any of them individually afterwards.
+
+   'lithium' packages the defaults already declared above, unchanged
+   — selecting it (it's also the default) must reproduce today's
+   numbers exactly.
+
+   'flow' (vanadium redox) is an APPROXIMATION: it swaps these five
+   inputs only, not independent power/energy sizing or electrolyte
+   residual value. It's a close estimate of flow economics, not a
+   flow-specific physics model.
+   ------------------------------------------------------------------ */
+export const CHEMISTRY_OPTIONS = ['lithium', 'flow']
+
+export const DEFAULT_CHEMISTRY = 'lithium'
+
+export const CHEMISTRY_PRESETS = {
+  lithium: {
+    rte_by_duration: RTE_BY_DURATION,
+    dod_pct: ADVANCED_DEFAULTS.dod_pct,
+    degradation_per_full_cycle_pct: DEGRADATION_DEFAULTS.degradation_per_full_cycle_pct,
+    calendar_degradation_pct_yr: DEGRADATION_DEFAULTS.calendar_degradation_pct_yr,
+    project_life_years: ADVANCED_DEFAULTS.project_life_years,
+    capex_energy_eur_kwh: ADVANCED_DEFAULTS.capex_energy_eur_kwh
+  },
+  flow: {
+    // Vanadium flow round-trip efficiency (real-world AC, incl. pumps + power electronics) | sources: Invinity (75% DC) https://invinity.com/what-does-battery-storage-cost/ + Risø DTU (~60% installed) + arXiv 2301.02535 (75–85% cell) | set: 2026-07 | 70% chosen as honest real-world AC figure; lab/cell figures run higher. Flow trades efficiency for longevity.
+    rte_by_duration: { 1: 0.7, 2: 0.7, 4: 0.7 },
+    // Depth of discharge | source: discoveryalert.com VRFB guide + arXiv 2301.02535 | set: 2026-07 | Flow sustains 100% DoD with no capacity penalty.
+    dod_pct: 100,
+    // Annual degradation | source: arXiv 2301.02535 ("virtually no degradation") vs eureka.patsnap 2–3% membrane crossover | set: 2026-07 | 0.5%/yr total — flow's near-zero degradation is its core economic advantage; conservative vs the "zero" some vendors claim. Unlike lithium, flow ages mainly with TIME, not cycling: capacity fade comes from electrolyte membrane crossover (a slow, calendar process), not electrode wear, so the split is calendar-dominated — at the 365-cycle default, 0.45 + 365 * 0.000137 ≈ 0.5%/yr, and raising cycles/yr barely moves the total (unlike lithium, where per-cycle wear dominates).
+    degradation_per_full_cycle_pct: 0.000137,
+    calendar_degradation_pct_yr: 0.45,
+    // Operational life | source: eureka.patsnap 15–25yr + sciencedirect 20,000 cycles | set: 2026-07 | 25yr typical.
+    project_life_years: 25,
+    // Vanadium flow energy CAPEX per kWh, utility-scale | sources: Invinity (flow = 1–2x lithium CAPEX) + ziontechnologies $350–600/kWh + sustainability-directory €260/kWh 10h target | set: 2026-07 | €400/kWh ≈ 1.8x the lithium €220 default. Higher upfront, offset by 25yr life + no degradation. Falling as supply scales; re-check before launch.
+    capex_energy_eur_kwh: 400
+  }
+}
+
+/* ------------------------------------------------------------------
    STAGE 2 — FEATURE 2: revenue stacking with zero-sum allocation
    Capacity given to FCR/balancing is capacity taken away from
    arbitrage — allocations always sum to 100%. `fcr_price_eur_mw_yr`

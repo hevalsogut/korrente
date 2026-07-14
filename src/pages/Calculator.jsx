@@ -10,6 +10,9 @@ import {
   DURATION_OPTIONS,
   DEFAULT_DURATION_H,
   DEFAULT_POWER_MW,
+  CHEMISTRY_OPTIONS,
+  DEFAULT_CHEMISTRY,
+  CHEMISTRY_PRESETS,
   ADVANCED_DEFAULTS,
   DEGRADATION_DEFAULTS,
   STACKING_DEFAULTS,
@@ -22,6 +25,7 @@ import './Calculator.css'
 
 const initialInputs = {
   mode: DEFAULT_MODE,
+  chemistry: DEFAULT_CHEMISTRY,
   power_mw: DEFAULT_POWER_MW,
   duration_h: DEFAULT_DURATION_H,
   ...ADVANCED_DEFAULTS,
@@ -194,6 +198,7 @@ function buildCashflowCsv({ t, inputs, results }) {
   rows.push([])
   rows.push([csv('assumptionsTitle')])
   rows.push([csv('mode'), inputs.mode === 'solar' ? t('calculator.modeSolar') : t('calculator.modeGrid')])
+  rows.push([csv('chemistry'), inputs.chemistry === 'flow' ? t('calculator.chemistryFlow') : t('calculator.chemistryLithium')])
   rows.push([csv('power'), csvNumber(inputs.power_mw)])
   rows.push([csv('duration'), csvNumber(inputs.duration_h)])
   rows.push([csv('priceSpread'), csvNumber(inputs.price_spread_eur_mwh)])
@@ -250,6 +255,23 @@ export default function Calculator() {
   const updateChecked = (key) => (e) => {
     setInputs((prev) => ({ ...prev, [key]: e.target.checked }))
   }
+  // Loads a chemistry preset's engineering + cost defaults into the
+  // existing advanced fields — a starting point the user can still
+  // edit individually afterwards, not a locked-in override.
+  const updateChemistry = (e) => {
+    const chemistry = e.target.value
+    const preset = CHEMISTRY_PRESETS[chemistry] || CHEMISTRY_PRESETS[DEFAULT_CHEMISTRY]
+    setInputs((prev) => ({
+      ...prev,
+      chemistry,
+      rte_by_duration: preset.rte_by_duration,
+      dod_pct: preset.dod_pct,
+      degradation_per_full_cycle_pct: preset.degradation_per_full_cycle_pct,
+      calendar_degradation_pct_yr: preset.calendar_degradation_pct_yr,
+      project_life_years: preset.project_life_years,
+      capex_energy_eur_kwh: preset.capex_energy_eur_kwh
+    }))
+  }
 
   const resultCards = [
     { key: 'nameplate', value: `${fmtNumber(lang, results.E_nom_mwh, 1)} MWh` },
@@ -304,6 +326,18 @@ export default function Calculator() {
           {/* Inputs */}
           <Reveal className="calc-panel">
             <h2 className="h4">{t('calculator.inputsTitle')}</h2>
+
+            <div className="calc-field">
+              <label htmlFor="calc-chemistry">{t('calculator.chemistryLabel')}</label>
+              <select id="calc-chemistry" value={inputs.chemistry} onChange={updateChemistry}>
+                {CHEMISTRY_OPTIONS.map((chemistry) => (
+                  <option key={chemistry} value={chemistry}>
+                    {chemistry === 'lithium' ? t('calculator.chemistryLithium') : t('calculator.chemistryFlow')}
+                  </option>
+                ))}
+              </select>
+              <p className="calc-field__help">{t('calculator.chemistryHelp')}</p>
+            </div>
 
             <div className="calc-field">
               <label htmlFor="calc-mode">{t('calculator.modeLabel')}</label>
