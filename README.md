@@ -139,6 +139,18 @@ calls.
   between self-consumption (avoided retail import) and export (feed-in
   tariff, or retail-parity pricing if net metering applies).
 
+**Battery chemistry** — a Lithium LFP / Vanadium Flow selector, available in
+both modes, loads a preset bundle of engineering + cost defaults (RTE, depth
+of discharge, degradation, project life, energy CAPEX) into the advanced
+fields below; any of them can still be overridden by hand afterwards. The
+calculation engine itself is chemistry-agnostic — it only ever sees the
+resulting numbers via an optional `rte_by_duration` override table, never a
+"chemistry" concept. The flow preset is a deliberate approximation (it swaps
+those five inputs only, not independent power/energy sizing or electrolyte
+residual value) and is calendar-dominated in its degradation — flow ages
+mainly with time (membrane crossover), not cycling, which is its core
+durability advantage over lithium.
+
 **Inputs are tiered.** Power, duration (1/2/4 h — each maps to a fixed
 round-trip efficiency), and, in solar mode, PV size and annual consumption are
 front and centre. An "Advanced parameters" panel exposes everything else:
@@ -163,13 +175,15 @@ summer/winter generation bar.
 | --- | --- |
 | `src/pages/Calculator.jsx` | Form state, layout, and result formatting (bilingual, `Intl.NumberFormat` currency/number output) |
 | `src/lib/calculator.js` | `calculateRevenue(inputs)` — the whole model as one pure, dependency-free function; every field is coerced and clamped, so it's safe to call directly with raw form-state strings |
-| `src/data/calculatorConfig.js` | Defaults, input min/max limits, and the RTE-by-duration table — tune assumptions here without touching the math |
+| `src/data/calculatorConfig.js` | Defaults, input min/max limits, the RTE-by-duration table, and `CHEMISTRY_PRESETS` (Lithium LFP / Vanadium Flow) — tune assumptions here without touching the math |
 
 Because `calculateRevenue` has no React/i18n/side effects, it's straightforward
-to unit-test with plain input/output objects. Read the inline comments in
-`calculator.js` before changing the math — they document scope rules (e.g.
-battery-only vs. total-project CAPEX, what LCOS is and isn't allowed to
-include) that are easy to accidentally break.
+to unit-test with plain input/output objects — `test.js` (run with `node
+test.js`) does exactly that, including a dedicated group per chemistry preset
+and mode. Read the inline comments in `calculator.js` before changing the
+math — they document scope rules (e.g. battery-only vs. total-project CAPEX,
+what LCOS is and isn't allowed to include) that are easy to accidentally
+break.
 
 The pre-filled defaults are sourced, placeholder Netherlands market/engineering
 assumptions (see the sourcing comments in `calculatorConfig.js`) — the on-page
