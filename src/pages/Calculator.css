@@ -213,6 +213,29 @@
   background: #fef6f6;
   color: #c23434;
 }
+.calc-viability--neutral {
+  background: var(--paper-100);
+  color: var(--text-on-light-muted);
+  font-weight: 500;
+}
+
+/* Project-level verdict — the headline answer (driven by overall NPV),
+   deliberately more prominent than the arbitrage-only banner above. */
+.calc-verdict {
+  margin-top: var(--space-sm);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: var(--step-0);
+}
+.calc-verdict--positive {
+  background: color-mix(in srgb, var(--mint-500) 16%, transparent);
+  color: var(--mint-600);
+}
+.calc-verdict--negative {
+  background: #fef6f6;
+  color: #c23434;
+}
 
 /* Results */
 .calc-results {

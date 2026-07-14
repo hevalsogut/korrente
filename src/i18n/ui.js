@@ -310,8 +310,16 @@ export const ui = {
           "Same profit expressed in today's money, using a {rate}% discount rate — the more conservative, finance-grade figure.",
         lcos: 'Levelised cost of storage (LCOS)',
         npv: 'Net present value (NPV)',
+        projectViable: 'Viable — positive NPV over the project life.',
+        projectNotViable: 'Not viable — negative NPV over the project life at current assumptions.',
         viable: 'Viable on arbitrage alone at current assumptions.',
-        notViable: 'Not viable on arbitrage alone — consider revenue stacking.',
+        notViable: 'Not viable on arbitrage alone at current assumptions — enable revenue stacking or solar pairing to improve returns.',
+        notViableSolarNote:
+          'This battery would not cover its cost on arbitrage alone — but in solar-paired mode, solar generation and self-consumption drive the returns (see NPV above).',
+        notViableStackingNote:
+          'This battery would not cover its cost on arbitrage alone — but revenue stacking (FCR/balancing) is driving positive overall returns (see NPV above).',
+        notViableWarnSolar:
+          'Not viable at current assumptions, even with solar revenue included — consider revenue stacking or adjusting inputs.',
         scopeNote: 'Arbitrage-only test — excludes FCR, balancing and solar. See NPV for the full revenue picture.',
         viabilityNote: 'Compares the net spread captured per MWh discharged ({spread}) against LCOS ({lcos}).',
         tableTitle: 'Per-year cashflow',

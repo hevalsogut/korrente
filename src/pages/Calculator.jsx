@@ -315,6 +315,30 @@ export default function Calculator() {
     fmtNumber(lang, Number(inputs.discount_rate_pct), 1)
   )
 
+  // Project-level verdict — driven by overall NPV, not the arbitrage-only
+  // test below. This is the number that should read as the headline
+  // answer: a project can be a poor arbitrage play and still be a good
+  // investment once solar or stacking revenue is counted.
+  const projectViable = results.lifecycle.npv_eur > 0
+
+  // The arbitrage-only flag (captured spread vs LCOS) stays available as
+  // a secondary, honestly-scoped note — but it must never read as the
+  // project-level verdict when the project is actually viable overall
+  // (solar/stacking revenue covering what arbitrage alone doesn't).
+  let arbitrageBannerVariant = 'calc-viability--ok'
+  let arbitrageBannerText = t('calculator.lifecycle.viable')
+  if (!results.lifecycle.viableOnArbitrage) {
+    if (projectViable) {
+      arbitrageBannerVariant = 'calc-viability--neutral'
+      arbitrageBannerText = isSolar
+        ? t('calculator.lifecycle.notViableSolarNote')
+        : t('calculator.lifecycle.notViableStackingNote')
+    } else {
+      arbitrageBannerVariant = 'calc-viability--warn'
+      arbitrageBannerText = isSolar ? t('calculator.lifecycle.notViableWarnSolar') : t('calculator.lifecycle.notViable')
+    }
+  }
+
   return (
     <>
       <Seo title={seo.title} description={seo.description} path="/calculator" />
@@ -647,6 +671,10 @@ export default function Calculator() {
               <p className="calc-field__help">{t('calculator.lifecycle.lifetimeProfitNote')}</p>
               <p className="calc-field__help">{npvTodayNote}</p>
 
+              <p className={`calc-verdict ${projectViable ? 'calc-verdict--positive' : 'calc-verdict--negative'}`}>
+                {projectViable ? t('calculator.lifecycle.projectViable') : t('calculator.lifecycle.projectNotViable')}
+              </p>
+
               <div className="calc-results__grid">
                 <div className="calc-card">
                   <span className="calc-card__label">{t('calculator.lifecycle.lcos')}</span>
@@ -657,9 +685,7 @@ export default function Calculator() {
                   <span className="calc-card__value">{fmtCurrency(lang, results.lifecycle.npv_eur, 0)}</span>
                 </div>
               </div>
-              <p className={`calc-viability ${results.lifecycle.viableOnArbitrage ? 'calc-viability--ok' : 'calc-viability--warn'}`}>
-                {results.lifecycle.viableOnArbitrage ? t('calculator.lifecycle.viable') : t('calculator.lifecycle.notViable')}
-              </p>
+              <p className={`calc-viability ${arbitrageBannerVariant}`}>{arbitrageBannerText}</p>
               <p className="calc-field__help">{t('calculator.lifecycle.scopeNote')}</p>
               <p className="calc-field__help">
                 {t('calculator.lifecycle.viabilityNote').replace('{spread}', spreadLabel).replace('{lcos}', lcosLabel)}
