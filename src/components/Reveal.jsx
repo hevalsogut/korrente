@@ -9,18 +9,31 @@ import { useEffect, useRef, useState } from 'react'
  *  - as: element/component to render (default 'div')
  *  - delay: stagger delay in ms
  *  - className: extra classes
+ *  - onVisible: optional callback fired once, the same moment the
+ *    element first becomes visible — lets content inside (e.g. a
+ *    count-up number) start its own animation in sync with the reveal
+ *    instead of on mount, which may happen while still off-screen.
  */
-export default function Reveal({ as: Tag = 'div', delay = 0, className = '', children, ...rest }) {
+export default function Reveal({ as: Tag = 'div', delay = 0, className = '', onVisible, children, ...rest }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
+  // Kept in a ref so the observer effect (deps: []) always calls the
+  // latest callback without needing to re-subscribe on every render.
+  const onVisibleRef = useRef(onVisible)
+  onVisibleRef.current = onVisible
 
   useEffect(() => {
     const node = ref.current
     if (!node) return
 
+    const reveal = () => {
+      setVisible(true)
+      onVisibleRef.current?.()
+    }
+
     // If IntersectionObserver is unavailable, show immediately.
     if (typeof IntersectionObserver === 'undefined') {
-      setVisible(true)
+      reveal()
       return
     }
 
@@ -28,7 +41,7 @@ export default function Reveal({ as: Tag = 'div', delay = 0, className = '', chi
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setVisible(true)
+            reveal()
             observer.unobserve(entry.target)
           }
         })

@@ -20,6 +20,7 @@ import {
   LIFETIME_DEFAULTS
 } from '../data/calculatorConfig.js'
 import { calculateRevenue } from '../lib/calculator.js'
+import { useCountUp } from '../lib/useCountUp.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Calculator.css'
 
@@ -130,6 +131,15 @@ function Bar({ label, valueLabel, pct }) {
   )
 }
 
+/* Counts a result card's number up to its current value (see
+   useCountUp) and formats every animated frame with the same `format`
+   the final value uses — so the displayed string is always a properly
+   formatted euro/percent/year figure, never a raw number mid-roll. */
+function AnimatedNumber({ value, format, enabled = true }) {
+  const display = useCountUp(value, { enabled })
+  return format(display)
+}
+
 function locale(lang) {
   return 'en-US'
 }
@@ -224,6 +234,11 @@ export default function Calculator() {
   const { t, lang } = useI18n()
   const [inputs, setInputs] = useState(initialInputs)
   const [openNotes, setOpenNotes] = useState({})
+  // Gates every result card's count-up so it starts in sync with the
+  // results panel's own scroll-reveal, not on mount — otherwise the
+  // animation can run (and finish) while the panel is still off-screen
+  // with opacity: 0, and the user never sees it roll.
+  const [resultsRevealed, setResultsRevealed] = useState(false)
 
   // FCR/balancing toggles gate whether their % allocation actually
   // reaches the calculator — unchecking keeps the typed % in local
@@ -273,23 +288,26 @@ export default function Calculator() {
     }))
   }
 
+  // `raw` + `format` (rather than a pre-formatted string) so each card can
+  // count up via <AnimatedNumber> — every animated frame runs through the
+  // same `format`, so the displayed string is always properly formatted.
+  // `staticText` (payback when not viable) skips animation entirely.
   const resultCards = [
-    { key: 'nameplate', value: `${fmtNumber(lang, results.E_nom_mwh, 1)} MWh` },
-    { key: 'usable', value: `${fmtNumber(lang, results.E_use_mwh, 1)} MWh` },
-    { key: 'rte', value: `${fmtNumber(lang, results.rte * 100, 0)}%`, badge: t('calculator.auto') },
-    { key: 'capex', value: fmtCurrency(lang, results.capex_eur, 0) },
-    { key: 'capexPerKwh', value: `${fmtCurrency(lang, results.capex_per_kwh, 0)}/kWh` },
-    { key: 'grossRevenue', value: fmtCurrency(lang, results.annual_gross_eur, 0) },
-    { key: 'netIncome', value: fmtCurrency(lang, results.annual_net_eur, 0) },
+    { key: 'nameplate', raw: results.E_nom_mwh, format: (v) => `${fmtNumber(lang, v, 1)} MWh` },
+    { key: 'usable', raw: results.E_use_mwh, format: (v) => `${fmtNumber(lang, v, 1)} MWh` },
+    { key: 'rte', raw: results.rte * 100, format: (v) => `${fmtNumber(lang, v, 0)}%`, badge: t('calculator.auto') },
+    { key: 'capex', raw: results.capex_eur, format: (v) => fmtCurrency(lang, v, 0) },
+    { key: 'capexPerKwh', raw: results.capex_per_kwh, format: (v) => `${fmtCurrency(lang, v, 0)}/kWh` },
+    { key: 'grossRevenue', raw: results.annual_gross_eur, format: (v) => fmtCurrency(lang, v, 0) },
+    { key: 'netIncome', raw: results.annual_net_eur, format: (v) => fmtCurrency(lang, v, 0) },
     {
       key: 'payback',
-      value:
-        results.payback_years == null
-          ? t('calculator.notViable')
-          : `${fmtNumber(lang, results.payback_years, 1)} ${t('calculator.years')}`,
+      raw: results.payback_years,
+      format: (v) => `${fmtNumber(lang, v, 1)} ${t('calculator.years')}`,
+      staticText: results.payback_years == null ? t('calculator.notViable') : null,
       muted: results.payback_years == null
     },
-    { key: 'roi', value: `${fmtNumber(lang, results.roi_pct, 1)}%` }
+    { key: 'roi', raw: results.roi_pct, format: (v) => `${fmtNumber(lang, v, 1)}%` }
   ]
 
   const fcrIneligibleNote = t('calculator.stacking.ineligible')
@@ -613,7 +631,7 @@ export default function Calculator() {
           </Reveal>
 
           {/* Results */}
-          <Reveal className="calc-results" delay={100}>
+          <Reveal className="calc-results" delay={100} onVisible={() => setResultsRevealed(true)}>
             <h2 className="h4">{t('calculator.resultsTitle')}</h2>
             <div className="calc-results__grid">
               {resultCards.map((card) => (
@@ -623,7 +641,11 @@ export default function Calculator() {
                     {card.badge && <span className="calc-card__badge">{card.badge}</span>}
                   </span>
                   <span className={`calc-card__value ${card.muted ? 'calc-card__value--muted' : ''}`}>
-                    {card.value}
+                    {card.staticText != null ? (
+                      card.staticText
+                    ) : (
+                      <AnimatedNumber value={card.raw} format={card.format} enabled={resultsRevealed} />
+                    )}
                   </span>
                 </div>
               ))}
@@ -658,13 +680,13 @@ export default function Calculator() {
                 <div className="calc-card">
                   <span className="calc-card__label">{lifetimeProfitLabel}</span>
                   <span className={`calc-card__value ${lifetimeNetProfitEur < 0 ? 'calc-card__value--negative' : ''}`}>
-                    {fmtCurrency(lang, lifetimeNetProfitEur, 0)}
+                    <AnimatedNumber value={lifetimeNetProfitEur} format={(v) => fmtCurrency(lang, v, 0)} enabled={resultsRevealed} />
                   </span>
                 </div>
                 <div className="calc-card">
                   <span className="calc-card__label">{t('calculator.lifecycle.npvToday')}</span>
                   <span className={`calc-card__value ${results.lifecycle.npv_eur < 0 ? 'calc-card__value--negative' : ''}`}>
-                    {fmtCurrency(lang, results.lifecycle.npv_eur, 0)}
+                    <AnimatedNumber value={results.lifecycle.npv_eur} format={(v) => fmtCurrency(lang, v, 0)} enabled={resultsRevealed} />
                   </span>
                 </div>
               </div>
@@ -678,11 +700,23 @@ export default function Calculator() {
               <div className="calc-results__grid">
                 <div className="calc-card">
                   <span className="calc-card__label">{t('calculator.lifecycle.lcos')}</span>
-                  <span className="calc-card__value">{lcosLabel}</span>
+                  <span className="calc-card__value">
+                    {results.lifecycle.lcos_eur_per_mwh != null ? (
+                      <AnimatedNumber
+                        value={results.lifecycle.lcos_eur_per_mwh}
+                        format={(v) => `${fmtCurrency(lang, v, 0)}/MWh`}
+                        enabled={resultsRevealed}
+                      />
+                    ) : (
+                      '—'
+                    )}
+                  </span>
                 </div>
                 <div className="calc-card">
                   <span className="calc-card__label">{t('calculator.lifecycle.npv')}</span>
-                  <span className="calc-card__value">{fmtCurrency(lang, results.lifecycle.npv_eur, 0)}</span>
+                  <span className="calc-card__value">
+                    <AnimatedNumber value={results.lifecycle.npv_eur} format={(v) => fmtCurrency(lang, v, 0)} enabled={resultsRevealed} />
+                  </span>
                 </div>
               </div>
               <p className={`calc-viability ${arbitrageBannerVariant}`}>{arbitrageBannerText}</p>
