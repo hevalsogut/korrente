@@ -16,6 +16,11 @@ const BASE = import.meta.env.VITE_STRAPI_URL
 const ORIGIN = BASE?.replace(/\/api\/?$/, '')
 
 async function fetchJson(path) {
+  // No CMS configured (VITE_STRAPI_URL unset) — skip the network call
+  // entirely rather than firing a doomed fetch that just logs a console
+  // error before falling back; callers already fall back on any thrown
+  // error the same way.
+  if (!BASE) throw new Error('VITE_STRAPI_URL is not configured')
   const res = await fetch(`${BASE}/api/${path}`)
   if (!res.ok) throw new Error(`Strapi request failed: ${res.status} ${res.statusText}`)
   return res.json()
