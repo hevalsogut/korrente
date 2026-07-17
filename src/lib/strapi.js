@@ -169,12 +169,13 @@ export async function fetchSolutionsPage() {
   }
 }
 
-/* Home page hero + closing CTA — a Strapi single type, so `data` is one
-   object, not an array. Site is English-only, so fields are plain strings
-   (no {en,tr} wrapping). Fallback matches the copy previously hardcoded in
-   src/i18n/ui.js under `home.heroTitleStart`/`.heroTitleAccent`/
-   `.heroTitleEnd`/`.heroLead`/`common.discoverMore` and `cta.eyebrow`/
-   `.title`/`.body`/`common.startProject`, plus src/data/site.js `email`. */
+/* Home page — a Strapi single type, so `data` is one object, not an array.
+   Site is English-only, so fields are plain strings (no {en,tr} wrapping).
+   Fallback matches the copy previously hardcoded in src/i18n/ui.js under
+   `home.*` (heroTitleStart/Accent/End, features, partnersLabel, intro*,
+   solutions*, why*), `common.discoverMore`/`.allSolutions`, `cta.*`,
+   `stats.*`, plus src/data/content.js `values`/`stats` and the partner
+   name list and email that used to live directly in Home.jsx/site.js. */
 export const HOME_PAGE_FALLBACK = {
   heroHeadingLine1: 'We manage ',
   heroHeadingHighlight: 'energy flow.',
@@ -183,6 +184,78 @@ export const HOME_PAGE_FALLBACK = {
     'Advanced energy storage and system integration solutions for a resilient and flexible energy infrastructure.',
   heroCtaLabel: 'Discover more',
   heroCtaLink: '/solutions',
+
+  featureCards: [
+    { iconKey: 'battery', title: 'Grid-scale storage', description: 'High-performance battery systems for utility and industry.' },
+    { iconKey: 'grid', title: 'System integration', description: 'Seamless integration for complex energy systems.' },
+    { iconKey: 'compass', title: 'European expertise', description: 'Engineered and operated across Europe.' },
+    { iconKey: 'leaf', title: 'Sustainable impact', description: 'Driving the transition to a clean energy future.' }
+  ],
+
+  trustedLabel: 'Trusted by utilities & industry leaders',
+  logos: [
+    { name: 'Cascade Power' },
+    { name: 'Meridian Utilities' },
+    { name: 'Northwind' },
+    { name: 'Solano Grid' },
+    { name: 'Vanta Energy' },
+    { name: 'Helios Co-op' }
+  ],
+
+  whoEyebrow: 'Who we are',
+  whoHeadingStart: 'We are an energy company built on a simple conviction: clean power only changes the world if it’s',
+  whoHeadingHighlight: 'reliable',
+  whoHeadingEnd: ', affordable, and built to last.',
+  whoBody1:
+    'For over a decade, Korrente has developed and operated renewable generation across solar, wind, and storage — not as isolated projects, but as a coordinated fleet managed by our own grid intelligence platform.',
+  whoBody2:
+    'That means we deliver firm, dispatchable clean energy: power that shows up when the grid needs it, backed by engineering rigour and a genuine commitment to the communities we operate in.',
+  whoLinkLabel: 'Get in touch',
+  whoLinkUrl: '/contact',
+
+  doEyebrow: 'What we do',
+  doHeading: 'A full-stack clean energy company.',
+  doSubhead:
+    'From the first megawatt of a project to real-time dispatch on the grid, we own every layer that makes renewable power dependable.',
+  doCtaLabel: 'All solutions',
+  doCtaLink: '/solutions',
+
+  whyEyebrow: 'Why Korrente',
+  whyHeading: 'The advantages of an owner-operator.',
+  whySubhead:
+    'We don’t hand projects off. We build them to run for decades — and we’re still there on year twenty.',
+  reasons: [
+    {
+      title: 'Owner-operators, end to end',
+      description:
+        'We develop, build, and run our assets for decades. Owning the whole lifecycle means the decisions we make on day one are the ones we live with on year twenty.'
+    },
+    {
+      title: 'Engineering-led, not hype-led',
+      description:
+        'Every project is underwritten by measured data, conservative modelling, and independent review. We build infrastructure that has to work — so we prove it will.'
+    },
+    {
+      title: 'Built for a flexible grid',
+      description:
+        'Renewables plus storage plus intelligent dispatch. We deliver firm, dispatchable clean power, not just nameplate capacity that disappears when the weather turns.'
+    },
+    {
+      title: 'Rooted in community',
+      description:
+        'Projects succeed when the people around them benefit. We share ownership, invest locally, and stay long after commissioning day.'
+    }
+  ],
+
+  impactEyebrow: 'Impact',
+  impactHeading: 'Measured in gigawatts and greenhouse gas that never happened.',
+  stats: [
+    { value: '2.5 GWh+', label: 'Projects in operation and under construction' },
+    { value: '10+', label: 'Countries across Europe' },
+    { value: '1.2 GW+', label: 'Pipeline capacity' },
+    { value: '100%', label: 'Focused on energy storage' }
+  ],
+
   ctaEyebrow: 'Let’s build',
   ctaHeading: 'Ready to power what comes next?',
   ctaSubhead:
@@ -193,6 +266,11 @@ export const HOME_PAGE_FALLBACK = {
 }
 
 function mapHomePage(item) {
+  const featureCards = item.featureCards || []
+  const logos = item.logos || []
+  const reasons = item.reasons || []
+  const stats = item.stats || []
+
   return {
     heroHeadingLine1: item.heroHeadingLine1,
     heroHeadingHighlight: item.heroHeadingHighlight,
@@ -200,6 +278,40 @@ function mapHomePage(item) {
     heroSubhead: item.heroSubhead,
     heroCtaLabel: item.heroCtaLabel,
     heroCtaLink: item.heroCtaLink,
+
+    featureCards: featureCards.length
+      ? featureCards.map((f) => ({ iconKey: f.iconKey, title: f.title, description: f.description }))
+      : HOME_PAGE_FALLBACK.featureCards,
+
+    trustedLabel: item.trustedLabel || HOME_PAGE_FALLBACK.trustedLabel,
+    logos: logos.length ? logos.map((l) => ({ name: l.name })) : HOME_PAGE_FALLBACK.logos,
+
+    whoEyebrow: item.whoEyebrow || HOME_PAGE_FALLBACK.whoEyebrow,
+    whoHeadingStart: item.whoHeadingStart || HOME_PAGE_FALLBACK.whoHeadingStart,
+    whoHeadingHighlight: item.whoHeadingHighlight || HOME_PAGE_FALLBACK.whoHeadingHighlight,
+    whoHeadingEnd: item.whoHeadingEnd || HOME_PAGE_FALLBACK.whoHeadingEnd,
+    whoBody1: item.whoBody1 || HOME_PAGE_FALLBACK.whoBody1,
+    whoBody2: item.whoBody2 || HOME_PAGE_FALLBACK.whoBody2,
+    whoLinkLabel: item.whoLinkLabel || HOME_PAGE_FALLBACK.whoLinkLabel,
+    whoLinkUrl: item.whoLinkUrl || HOME_PAGE_FALLBACK.whoLinkUrl,
+
+    doEyebrow: item.doEyebrow || HOME_PAGE_FALLBACK.doEyebrow,
+    doHeading: item.doHeading || HOME_PAGE_FALLBACK.doHeading,
+    doSubhead: item.doSubhead || HOME_PAGE_FALLBACK.doSubhead,
+    doCtaLabel: item.doCtaLabel || HOME_PAGE_FALLBACK.doCtaLabel,
+    doCtaLink: item.doCtaLink || HOME_PAGE_FALLBACK.doCtaLink,
+
+    whyEyebrow: item.whyEyebrow || HOME_PAGE_FALLBACK.whyEyebrow,
+    whyHeading: item.whyHeading || HOME_PAGE_FALLBACK.whyHeading,
+    whySubhead: item.whySubhead || HOME_PAGE_FALLBACK.whySubhead,
+    reasons: reasons.length
+      ? reasons.map((r) => ({ title: r.title, description: r.description }))
+      : HOME_PAGE_FALLBACK.reasons,
+
+    impactEyebrow: item.impactEyebrow || HOME_PAGE_FALLBACK.impactEyebrow,
+    impactHeading: item.impactHeading || HOME_PAGE_FALLBACK.impactHeading,
+    stats: stats.length ? stats.map((s) => ({ value: s.value, label: s.label })) : HOME_PAGE_FALLBACK.stats,
+
     ctaEyebrow: item.ctaEyebrow,
     ctaHeading: item.ctaHeading,
     ctaSubhead: item.ctaSubhead,
@@ -211,7 +323,7 @@ function mapHomePage(item) {
 
 export async function fetchHomePage() {
   try {
-    const json = await fetchJson('home-page')
+    const json = await fetchJson('home-page?populate=*')
     return json.data ? mapHomePage(json.data) : HOME_PAGE_FALLBACK
   } catch (err) {
     console.warn('Falling back to static home page copy:', err)
