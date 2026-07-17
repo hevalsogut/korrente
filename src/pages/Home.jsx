@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Button from '../components/Button.jsx'
@@ -12,6 +13,7 @@ import ContactCTA from '../components/ContactCTA.jsx'
 import { services } from '../data/services.js'
 import { values } from '../data/content.js'
 import { useI18n } from '../i18n/index.jsx'
+import { fetchHomePage, HOME_PAGE_FALLBACK } from '../lib/strapi.js'
 import './Home.css'
 
 const partners = ['Cascade Power', 'Meridian Utilities', 'Northwind', 'Solano Grid', 'Vanta Energy', 'Helios Co-op']
@@ -19,6 +21,13 @@ const featureIcons = ['battery', 'grid', 'compass', 'leaf']
 
 export default function Home() {
   const { t, pick, lang } = useI18n()
+  const [home, setHome] = useState(HOME_PAGE_FALLBACK)
+
+  useEffect(() => {
+    fetchHomePage()
+      .then(setHome)
+      .catch((err) => console.warn('Falling back to static home page copy:', err))
+  }, [])
 
   const seo = {
     title: 'We Manage Energy Flow',
@@ -38,16 +47,16 @@ export default function Home() {
         <div className="container hero__inner">
           <div className="hero__content">
             <Reveal as="h1" className="hero__title" delay={40}>
-              {t('home.heroTitleStart')}
-              <span className="accent-word">{t('home.heroTitleAccent')}</span>
-              {t('home.heroTitleEnd')}
+              {home.heroHeadingLine1}
+              <span className="accent-word">{home.heroHeadingHighlight}</span>{' '}
+              {home.heroHeadingLine2}
             </Reveal>
             <Reveal as="p" className="hero__lead lead" delay={150}>
-              {t('home.heroLead')}
+              {home.heroSubhead}
             </Reveal>
             <Reveal className="hero__actions" delay={220}>
-              <Button to="/solutions" size="lg" icon="arrow">
-                {t('common.discoverMore')}
+              <Button to={home.heroCtaLink} size="lg" icon="arrow">
+                {home.heroCtaLabel}
               </Button>
             </Reveal>
           </div>
@@ -166,7 +175,14 @@ export default function Home() {
       <Testimonials />
 
       {/* ---------- CONTACT CTA ---------- */}
-      <ContactCTA />
+      <ContactCTA
+        eyebrow={home.ctaEyebrow}
+        title={home.ctaHeading}
+        body={home.ctaSubhead}
+        buttonLabel={home.ctaButtonLabel}
+        buttonTo={home.ctaButtonLink}
+        email={home.ctaEmail}
+      />
     </>
   )
 }

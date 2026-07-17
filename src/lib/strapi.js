@@ -168,3 +168,53 @@ export async function fetchSolutionsPage() {
     return SOLUTIONS_PAGE_FALLBACK
   }
 }
+
+/* Home page hero + closing CTA — a Strapi single type, so `data` is one
+   object, not an array. Site is English-only, so fields are plain strings
+   (no {en,tr} wrapping). Fallback matches the copy previously hardcoded in
+   src/i18n/ui.js under `home.heroTitleStart`/`.heroTitleAccent`/
+   `.heroTitleEnd`/`.heroLead`/`common.discoverMore` and `cta.eyebrow`/
+   `.title`/`.body`/`common.startProject`, plus src/data/site.js `email`. */
+export const HOME_PAGE_FALLBACK = {
+  heroHeadingLine1: 'We manage ',
+  heroHeadingHighlight: 'energy flow.',
+  heroHeadingLine2: 'You shape the future.',
+  heroSubhead:
+    'Advanced energy storage and system integration solutions for a resilient and flexible energy infrastructure.',
+  heroCtaLabel: 'Discover more',
+  heroCtaLink: '/solutions',
+  ctaEyebrow: 'Let’s build',
+  ctaHeading: 'Ready to power what comes next?',
+  ctaSubhead:
+    'Tell us about your site, your load, or your decarbonisation target. Our development team will come back within two business days.',
+  ctaButtonLabel: 'Start a project',
+  ctaButtonLink: '/contact',
+  ctaEmail: 'info@korrente.com'
+}
+
+function mapHomePage(item) {
+  return {
+    heroHeadingLine1: item.heroHeadingLine1,
+    heroHeadingHighlight: item.heroHeadingHighlight,
+    heroHeadingLine2: item.heroHeadingLine2,
+    heroSubhead: item.heroSubhead,
+    heroCtaLabel: item.heroCtaLabel,
+    heroCtaLink: item.heroCtaLink,
+    ctaEyebrow: item.ctaEyebrow,
+    ctaHeading: item.ctaHeading,
+    ctaSubhead: item.ctaSubhead,
+    ctaButtonLabel: item.ctaButtonLabel,
+    ctaButtonLink: item.ctaButtonLink,
+    ctaEmail: item.ctaEmail
+  }
+}
+
+export async function fetchHomePage() {
+  try {
+    const json = await fetchJson('home-page')
+    return json.data ? mapHomePage(json.data) : HOME_PAGE_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static home page copy:', err)
+    return HOME_PAGE_FALLBACK
+  }
+}
