@@ -2,14 +2,13 @@ import { useEffect, useState, useCallback } from 'react'
 import Icon from './Icon.jsx'
 import Reveal from './Reveal.jsx'
 import SectionHeading from './SectionHeading.jsx'
-import { testimonials } from '../data/content.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Testimonials.css'
 
-export default function Testimonials() {
-  const { t, pick } = useI18n()
+export default function Testimonials({ eyebrow, heading, items }) {
+  const { t } = useI18n()
   const [active, setActive] = useState(0)
-  const count = testimonials.length
+  const count = items.length
 
   const go = useCallback((i) => setActive((i + count) % count), [count])
 
@@ -21,31 +20,29 @@ export default function Testimonials() {
     return () => clearInterval(timer)
   }, [active, count])
 
-  const current = testimonials[active]
+  const current = items[active]
 
   return (
-    <section className="testimonials surface-light section" aria-label={t('testimonials.eyebrow')}>
+    <section className="testimonials surface-light section" aria-label={eyebrow}>
       <div className="container">
-        <SectionHeading
-          eyebrow={t('testimonials.eyebrow')}
-          title={t('testimonials.title')}
-          align="center"
-        />
+        <SectionHeading eyebrow={eyebrow} title={heading} align="center" />
 
         <Reveal className="testimonials__stage">
           <span className="testimonials__quote-mark" aria-hidden="true">
             &ldquo;
           </span>
 
-          <blockquote key={current.id} className="testimonials__quote">
-            <p>{pick(current.quote)}</p>
+          <blockquote key={active} className="testimonials__quote">
+            <p>{current.quote}</p>
             <footer className="testimonials__author">
               <span className="testimonials__avatar" aria-hidden="true">
                 {current.name.split(' ').map((n) => n[0]).join('')}
               </span>
               <span>
                 <cite className="testimonials__name">{current.name}</cite>
-                <span className="testimonials__role">{pick(current.role)}</span>
+                <span className="testimonials__role">
+                  {current.role} · {current.company}
+                </span>
               </span>
             </footer>
           </blockquote>
@@ -60,9 +57,9 @@ export default function Testimonials() {
               <Icon name="arrow" size={20} style={{ transform: 'rotate(180deg)' }} />
             </button>
             <div className="testimonials__dots" role="tablist" aria-label={t('testimonials.choose')}>
-              {testimonials.map((item, i) => (
+              {items.map((item, i) => (
                 <button
-                  key={item.id}
+                  key={i}
                   type="button"
                   role="tab"
                   aria-selected={i === active}

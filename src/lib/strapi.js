@@ -256,6 +256,33 @@ export const HOME_PAGE_FALLBACK = {
     { value: '10+', label: 'Countries across Europe' },
     { value: '1.2 GW+', label: 'Pipeline capacity' },
     { value: '100%', label: 'Focused on energy storage' }
+  ],
+
+  partnersEnabled: true,
+  partnersEyebrow: 'Partners',
+  partnersHeading: 'Trusted by the utilities and industries we power.',
+  testimonials: [
+    {
+      quote:
+        'Korrente delivered our storage project ahead of schedule and has run it flawlessly since. They behave like a long-term partner, because they are one.',
+      name: 'Dana Whitfield',
+      role: 'VP, Grid Services',
+      company: 'Cascade Public Power'
+    },
+    {
+      quote:
+        'Their grid-intelligence platform gave us visibility we never had before. We can finally treat renewables as a firm, plannable resource.',
+      name: 'Marco Reyes',
+      role: 'Chief Operating Officer',
+      company: 'Meridian Utilities'
+    },
+    {
+      quote:
+        'From land to interconnection, the Korrente team was rigorous and transparent. The community benefit agreement they structured set a new bar for us.',
+      name: 'Priya Nair',
+      role: 'Director of Sustainability',
+      company: 'Northwind Manufacturing'
+    }
   ]
 }
 
@@ -264,6 +291,7 @@ function mapHomePage(item) {
   const logos = item.logos || []
   const reasons = item.reasons || []
   const stats = item.stats || []
+  const testimonials = item.testimonials || []
 
   return {
     heroHeadingLine1: item.heroHeadingLine1,
@@ -304,7 +332,16 @@ function mapHomePage(item) {
 
     impactEyebrow: item.impactEyebrow || HOME_PAGE_FALLBACK.impactEyebrow,
     impactHeading: item.impactHeading || HOME_PAGE_FALLBACK.impactHeading,
-    stats: stats.length ? stats.map((s) => ({ value: s.value, label: s.label })) : HOME_PAGE_FALLBACK.stats
+    stats: stats.length ? stats.map((s) => ({ value: s.value, label: s.label })) : HOME_PAGE_FALLBACK.stats,
+
+    // `??`, not `||` — a CMS editor setting this to false must stay false,
+    // not silently fall back to the static default of true.
+    partnersEnabled: item.partnersEnabled ?? HOME_PAGE_FALLBACK.partnersEnabled,
+    partnersEyebrow: item.partnersEyebrow || HOME_PAGE_FALLBACK.partnersEyebrow,
+    partnersHeading: item.partnersHeading || HOME_PAGE_FALLBACK.partnersHeading,
+    testimonials: testimonials.length
+      ? testimonials.map((t) => ({ quote: t.quote, name: t.name, role: t.role, company: t.company }))
+      : HOME_PAGE_FALLBACK.testimonials
   }
 }
 

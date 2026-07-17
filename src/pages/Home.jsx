@@ -214,7 +214,9 @@ export default function Home() {
       </section>
 
       {/* ---------- TESTIMONIALS ---------- */}
-      <Testimonials />
+      {home.partnersEnabled && (
+        <Testimonials eyebrow={home.partnersEyebrow} heading={home.partnersHeading} items={home.testimonials} />
+      )}
 
       {/* ---------- CONTACT CTA ---------- */}
       <ContactCTA />

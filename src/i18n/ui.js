@@ -80,8 +80,6 @@ export const ui = {
       heading: 'Measured in gigawatts and greenhouse gas that never happened.'
     },
     testimonials: {
-      eyebrow: 'Partners',
-      title: 'Trusted by the utilities and industries we power.',
       prev: 'Previous testimonial',
       next: 'Next testimonial',
       choose: 'Choose testimonial'
