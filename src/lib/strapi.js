@@ -173,9 +173,11 @@ export async function fetchSolutionsPage() {
    Site is English-only, so fields are plain strings (no {en,tr} wrapping).
    Fallback matches the copy previously hardcoded in src/i18n/ui.js under
    `home.*` (heroTitleStart/Accent/End, features, partnersLabel, intro*,
-   solutions*, why*), `common.discoverMore`/`.allSolutions`, `cta.*`,
-   `stats.*`, plus src/data/content.js `values`/`stats` and the partner
-   name list and email that used to live directly in Home.jsx/site.js. */
+   solutions*, why*), `common.discoverMore`/`.allSolutions`, `stats.*`,
+   plus src/data/content.js `values`/`stats` and the partner name list
+   that used to live directly in Home.jsx. The closing CTA copy lives in
+   the Global single type (see GLOBAL_FALLBACK/fetchGlobal below) — it's
+   shared across every page, not Home-specific. */
 export const HOME_PAGE_FALLBACK = {
   heroHeadingLine1: 'We manage ',
   heroHeadingHighlight: 'energy flow.',
@@ -254,15 +256,7 @@ export const HOME_PAGE_FALLBACK = {
     { value: '10+', label: 'Countries across Europe' },
     { value: '1.2 GW+', label: 'Pipeline capacity' },
     { value: '100%', label: 'Focused on energy storage' }
-  ],
-
-  ctaEyebrow: 'Let’s build',
-  ctaHeading: 'Ready to power what comes next?',
-  ctaSubhead:
-    'Tell us about your site, your load, or your decarbonisation target. Our development team will come back within two business days.',
-  ctaButtonLabel: 'Start a project',
-  ctaButtonLink: '/contact',
-  ctaEmail: 'info@korrente.com'
+  ]
 }
 
 function mapHomePage(item) {
@@ -310,14 +304,7 @@ function mapHomePage(item) {
 
     impactEyebrow: item.impactEyebrow || HOME_PAGE_FALLBACK.impactEyebrow,
     impactHeading: item.impactHeading || HOME_PAGE_FALLBACK.impactHeading,
-    stats: stats.length ? stats.map((s) => ({ value: s.value, label: s.label })) : HOME_PAGE_FALLBACK.stats,
-
-    ctaEyebrow: item.ctaEyebrow,
-    ctaHeading: item.ctaHeading,
-    ctaSubhead: item.ctaSubhead,
-    ctaButtonLabel: item.ctaButtonLabel,
-    ctaButtonLink: item.ctaButtonLink,
-    ctaEmail: item.ctaEmail
+    stats: stats.length ? stats.map((s) => ({ value: s.value, label: s.label })) : HOME_PAGE_FALLBACK.stats
   }
 }
 
@@ -328,5 +315,42 @@ export async function fetchHomePage() {
   } catch (err) {
     console.warn('Falling back to static home page copy:', err)
     return HOME_PAGE_FALLBACK
+  }
+}
+
+/* Global — a Strapi single type holding the shared "Let's build" closing
+   CTA, reused at the foot of every page via ContactCTA. One edit here
+   updates every page at once. Fallback matches the copy previously
+   hardcoded on the Home page (src/i18n/ui.js `cta.*`, plus
+   src/data/site.js `email`). Per-field fallback, same approach as
+   mapHomePage, so a blank field degrades to the static default. */
+export const GLOBAL_FALLBACK = {
+  ctaEyebrow: 'Let’s build',
+  ctaHeading: 'Ready to power what comes next?',
+  ctaSubhead:
+    'Tell us about your site, your load, or your decarbonisation target. Our development team will come back within two business days.',
+  ctaButtonLabel: 'Start a project',
+  ctaButtonLink: '/contact',
+  ctaEmail: 'info@korrente.com'
+}
+
+function mapGlobal(item) {
+  return {
+    ctaEyebrow: item.ctaEyebrow || GLOBAL_FALLBACK.ctaEyebrow,
+    ctaHeading: item.ctaHeading || GLOBAL_FALLBACK.ctaHeading,
+    ctaSubhead: item.ctaSubhead || GLOBAL_FALLBACK.ctaSubhead,
+    ctaButtonLabel: item.ctaButtonLabel || GLOBAL_FALLBACK.ctaButtonLabel,
+    ctaButtonLink: item.ctaButtonLink || GLOBAL_FALLBACK.ctaButtonLink,
+    ctaEmail: item.ctaEmail || GLOBAL_FALLBACK.ctaEmail
+  }
+}
+
+export async function fetchGlobal() {
+  try {
+    const json = await fetchJson('global')
+    return json.data ? mapGlobal(json.data) : GLOBAL_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static global CTA copy:', err)
+    return GLOBAL_FALLBACK
   }
 }

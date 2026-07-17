@@ -10,7 +10,7 @@ import { useI18n } from '../i18n/index.jsx'
 import './Solutions.css'
 
 export default function Solutions() {
-  const { t, pick, lang } = useI18n()
+  const { pick } = useI18n()
   const [services, setServices] = useState(staticServices)
   const [hero, setHero] = useState(SOLUTIONS_PAGE_FALLBACK)
 
@@ -124,7 +124,7 @@ export default function Solutions() {
         </div>
       </section>
 
-      <ContactCTA title={t('solutions.ctaTitle')} body={t('solutions.ctaBody')} />
+      <ContactCTA />
     </>
   )
 }

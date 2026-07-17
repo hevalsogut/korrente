@@ -10,13 +10,16 @@ import SectionHeading from '../components/SectionHeading.jsx'
 import ServiceCard from '../components/ServiceCard.jsx'
 import Testimonials from '../components/Testimonials.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
-import { services } from '../data/services.js'
-import { fetchHomePage, HOME_PAGE_FALLBACK } from '../lib/strapi.js'
+import { services as staticServices } from '../data/services.js'
+import { fetchHomePage, fetchSolutions, HOME_PAGE_FALLBACK } from '../lib/strapi.js'
 import '../components/StatsBand.css'
 import './Home.css'
 
 // Maps a CMS-supplied iconKey to the Icon name it already renders.
 const FEATURE_ICONS = { storage: 'battery', integration: 'grid', europe: 'compass', sustainable: 'leaf' }
+
+// Maps a CMS-supplied solution iconKey to the Icon name it should render.
+const SOLUTION_ICONS = { solar: 'sun', wind: 'wind', storage: 'battery', grid: 'grid', hydrogen: 'molecule', advisory: 'compass' }
 
 // Stats come from the CMS as a single display string (e.g. "2.5 GWh+"). Split
 // off the leading number so Counter can still animate the count-up; anything
@@ -31,11 +34,18 @@ function parseStatValue(value) {
 
 export default function Home() {
   const [home, setHome] = useState(HOME_PAGE_FALLBACK)
+  const [services, setServices] = useState(staticServices)
 
   useEffect(() => {
     fetchHomePage()
       .then(setHome)
       .catch((err) => console.warn('Falling back to static home page copy:', err))
+  }, [])
+
+  useEffect(() => {
+    fetchSolutions()
+      .then(setServices)
+      .catch((err) => console.warn('Falling back to static solutions:', err))
   }, [])
 
   const seo = {
@@ -142,9 +152,9 @@ export default function Home() {
           </div>
 
           <div className="solutions-overview__grid">
-            {services.map((service, i) => (
+            {services.slice(0, 6).map((service, i) => (
               <Reveal key={service.id} delay={(i % 3) * 90}>
-                <ServiceCard service={service} />
+                <ServiceCard service={{ ...service, icon: SOLUTION_ICONS[service.icon?.trim()] || service.icon }} />
               </Reveal>
             ))}
           </div>
@@ -207,14 +217,7 @@ export default function Home() {
       <Testimonials />
 
       {/* ---------- CONTACT CTA ---------- */}
-      <ContactCTA
-        eyebrow={home.ctaEyebrow}
-        title={home.ctaHeading}
-        body={home.ctaSubhead}
-        buttonLabel={home.ctaButtonLabel}
-        buttonTo={home.ctaButtonLink}
-        email={home.ctaEmail}
-      />
+      <ContactCTA />
     </>
   )
 }
