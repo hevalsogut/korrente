@@ -86,12 +86,6 @@ export const ui = {
       next: 'Next testimonial',
       choose: 'Choose testimonial'
     },
-    cta: {
-      eyebrow: 'Let’s build',
-      title: 'Ready to power what comes next?',
-      body:
-        'Tell us about your site, your load, or your decarbonisation target. Our development team will come back within two business days.'
-    },
     solutions: {
       eyebrow: 'Solutions',
       title: 'Every layer of dependable clean energy.',
@@ -104,10 +98,7 @@ export const ui = {
         { title: 'Develop', body: 'Permitting, community engagement, and engineering to make a project buildable and bankable.' },
         { title: 'Build', body: 'Disciplined EPC oversight that delivers on schedule, on budget, and to spec.' },
         { title: 'Operate', body: 'Decades of asset management and optimisation through our grid-intelligence platform.' }
-      ],
-      ctaTitle: 'Have a site, a load, or a target in mind?',
-      ctaBody:
-        'Whether it’s bare land, an offtake need, or a corporate net-zero goal, our team can map the fastest credible path to clean power.'
+      ]
     },
     sustainability: {
       eyebrow: 'Sustainability & Impact',
@@ -134,11 +125,7 @@ export const ui = {
         'Waste diverted from landfill',
         'Water intensity reduction',
         'Local hiring on projects'
-      ],
-      ctaEyebrow: 'Partner on impact',
-      ctaTitle: 'Building toward a target of your own?',
-      ctaBody:
-        'From 24/7 carbon-free energy matching to community benefit design, we help partners turn sustainability goals into built, operating infrastructure.'
+      ]
     },
     news: {
       eyebrow: 'Insights',
@@ -209,9 +196,7 @@ export const ui = {
         { title: 'Automated dispatch', body: 'Storage is co-optimised against live market prices and dispatched automatically, second by second.' },
         { title: 'Predictive maintenance', body: 'Sensor telemetry flags degradation early, so assets are serviced before they ever fault.' },
         { title: 'Open integration', body: 'Standards-based APIs connect to SCADA, market operators, and third-party assets with no lock-in.' }
-      ],
-      ctaTitle: 'Want a closer look at the platform?',
-      ctaBody: 'We’ll walk you through a live view of the fleet and how Korrente Grid could dispatch your assets.'
+      ]
     },
     projects: {
       eyebrow: 'Projects',
@@ -221,8 +206,6 @@ export const ui = {
       statusOperational: 'Operational',
       statusConstruction: 'Under construction',
       statusDevelopment: 'In development',
-      ctaTitle: 'Have a site or a project in mind?',
-      ctaBody: 'From bare land to grid connection, our team can map the fastest credible path to a built, operating asset.',
       backToProjects: 'Back to Projects',
       loading: 'Loading project…',
       notFoundTitle: 'Project not found.',

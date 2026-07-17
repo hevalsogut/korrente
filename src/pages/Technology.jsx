@@ -45,7 +45,7 @@ export default function Technology() {
         </div>
       </section>
 
-      <ContactCTA title={t('technology.ctaTitle')} body={t('technology.ctaBody')} />
+      <ContactCTA />
     </>
   )
 }

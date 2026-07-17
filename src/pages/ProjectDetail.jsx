@@ -105,7 +105,7 @@ export default function ProjectDetail() {
         </div>
       </section>
 
-      <ContactCTA title={t('projects.ctaTitle')} body={t('projects.ctaBody')} />
+      <ContactCTA />
     </>
   )
 }

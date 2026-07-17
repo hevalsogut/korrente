@@ -93,11 +93,7 @@ export default function Sustainability() {
         </div>
       </section>
 
-      <ContactCTA
-        eyebrow={t('sustainability.ctaEyebrow')}
-        title={t('sustainability.ctaTitle')}
-        body={t('sustainability.ctaBody')}
-      />
+      <ContactCTA />
     </>
   )
 }

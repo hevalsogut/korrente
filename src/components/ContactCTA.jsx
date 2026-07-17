@@ -5,12 +5,11 @@ import { fetchGlobal, GLOBAL_FALLBACK } from '../lib/strapi.js'
 import './ContactCTA.css'
 
 /**
- * Final call-to-action band. Reused at the foot of most pages.
- * Sources its copy from the shared Global single type, so one CMS edit
- * updates every page — pass eyebrow/title/body/buttonLabel/buttonTo/email
- * to override on a per-page basis.
+ * Final call-to-action band. Reused at the foot of every page, sourcing
+ * its copy from the shared Global single type so one CMS edit updates
+ * every page at once.
  */
-export default function ContactCTA({ eyebrow, title, body, buttonLabel, buttonTo, email }) {
+export default function ContactCTA() {
   const [global, setGlobal] = useState(GLOBAL_FALLBACK)
 
   useEffect(() => {
@@ -25,15 +24,15 @@ export default function ContactCTA({ eyebrow, title, body, buttonLabel, buttonTo
         <Reveal className="contact-cta__panel">
           <div className="contact-cta__glow" aria-hidden="true" />
           <div className="contact-cta__content">
-            <span className="eyebrow">{eyebrow || global.ctaEyebrow}</span>
-            <h2 className="contact-cta__title display-2">{title || global.ctaHeading}</h2>
-            <p className="contact-cta__body lead">{body || global.ctaSubhead}</p>
+            <span className="eyebrow">{global.ctaEyebrow}</span>
+            <h2 className="contact-cta__title display-2">{global.ctaHeading}</h2>
+            <p className="contact-cta__body lead">{global.ctaSubhead}</p>
             <div className="contact-cta__actions">
-              <Button to={buttonTo || global.ctaButtonLink} size="lg" icon="arrowUpRight">
-                {buttonLabel || global.ctaButtonLabel}
+              <Button to={global.ctaButtonLink} size="lg" icon="arrowUpRight">
+                {global.ctaButtonLabel}
               </Button>
-              <Button href={`mailto:${email || global.ctaEmail}`} variant="outline" size="lg" icon="mail">
-                {email || global.ctaEmail}
+              <Button href={`mailto:${global.ctaEmail}`} variant="outline" size="lg" icon="mail">
+                {global.ctaEmail}
               </Button>
             </div>
           </div>
