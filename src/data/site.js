@@ -7,7 +7,6 @@
 export const company = {
   name: 'Korrente',
   foundedYear: 2011,
-  email: 'info@korrente.com',
   pressEmail: 'press@korrente.com'
 }
 

@@ -344,12 +344,17 @@ export async function fetchHomePage() {
 
 /* Global — a Strapi single type holding content shared across pages: the
    "Let's build" closing CTA (reused at the foot of every page via
-   ContactCTA) and the Impact stats band (reused by Home and Projects via
-   StatsBand). One edit here updates every page at once. Fallback matches
-   the copy previously hardcoded on the Home page (src/i18n/ui.js `cta.*`
-   and `stats.*`, plus src/data/site.js `email` and src/data/content.js
-   `stats`). Per-field fallback, same approach as mapHomePage. Has a
-   component (impactStats), so the fetch needs `?populate=*`. */
+   ContactCTA), the Impact stats band (reused by Home and Projects via
+   StatsBand), the footer prose, and the site-wide SEO defaults (see
+   src/components/Seo.jsx — these are only the fallback used when a page
+   doesn't pass its own title/description/image, not per-page SEO). One
+   edit here updates every page at once. Fallback matches the copy
+   previously hardcoded on the Home page (src/i18n/ui.js `cta.*`, `stats.*`
+   and `footer.*`, plus src/data/site.js `company.email` and
+   src/data/content.js `stats`, and the constants previously hardcoded in
+   src/components/Seo.jsx / index.html). Per-field fallback, same approach
+   as mapHomePage. Has components (impactStats) and a media field
+   (seoOgImage), so the fetch needs `?populate=*`. */
 export const GLOBAL_FALLBACK = {
   ctaEyebrow: 'Let’s build',
   ctaHeading: 'Ready to power what comes next?',
@@ -366,7 +371,16 @@ export const GLOBAL_FALLBACK = {
     { value: '10+', label: 'Countries across Europe' },
     { value: '1.2 GW+', label: 'Pipeline capacity' },
     { value: '100%', label: 'Focused on energy storage' }
-  ]
+  ],
+
+  footerTagline:
+    'Powering what comes next. Korrente builds and operates clean energy infrastructure for a resilient, low-carbon grid.',
+  copyrightText: 'Korrente Energy, Inc. All rights reserved.',
+
+  seoTitle: 'Korrente — Energy Storage Solutions for a Stronger Grid',
+  seoDescription:
+    'Korrente delivers smart, scalable and reliable energy storage systems that empower the energy transition across Europe.',
+  seoOgImage: '/og-image.svg'
 }
 
 function mapGlobal(item) {
@@ -384,7 +398,14 @@ function mapGlobal(item) {
     impactHeading: item.impactHeading ?? GLOBAL_FALLBACK.impactHeading,
     impactStats: impactStats.length
       ? impactStats.map((s) => ({ value: s.value, label: s.label }))
-      : GLOBAL_FALLBACK.impactStats
+      : GLOBAL_FALLBACK.impactStats,
+
+    footerTagline: item.footerTagline ?? GLOBAL_FALLBACK.footerTagline,
+    copyrightText: item.copyrightText ?? GLOBAL_FALLBACK.copyrightText,
+
+    seoTitle: item.seoTitle ?? GLOBAL_FALLBACK.seoTitle,
+    seoDescription: item.seoDescription ?? GLOBAL_FALLBACK.seoDescription,
+    seoOgImage: toAbsoluteMediaUrl(item.seoOgImage?.url) ?? GLOBAL_FALLBACK.seoOgImage
   }
 }
 

@@ -31,11 +31,6 @@ export const ui = {
       showMore: 'Show more',
       showLess: 'Show less'
     },
-    footer: {
-      pitch:
-        'Powering what comes next. Korrente builds and operates clean energy infrastructure for a resilient, low-carbon grid.',
-      rights: '© {year} Korrente Energy, Inc. All rights reserved.'
-    },
     home: {
       heroEyebrow: 'Energy storage · System integration',
       heroTitleStart: 'We manage ',
