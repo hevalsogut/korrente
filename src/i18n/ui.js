@@ -144,16 +144,7 @@ export const ui = {
       notFoundBody: 'This article may have moved or never existed.'
     },
     contact: {
-      eyebrow: 'Contact',
-      title: 'Let’s talk about your energy.',
-      lead:
-        'Whether you’re bringing a site, a load, or a target, our development team will point you to the fastest credible path to clean power.',
-      infoTitle: 'Reach us directly',
       labelEmail: 'Email',
-      labelPhone: 'Phone',
-      labelHq: 'Headquarters',
-      labelHours: 'Office hours',
-      note: 'Typical response time is under two business days.',
       fieldName: 'Name',
       fieldEmail: 'Email',
       fieldCompany: 'Company',
@@ -177,8 +168,7 @@ export const ui = {
         'By submitting, you agree to our privacy policy. We’ll only use your details to respond to your enquiry.',
       successTitle: 'Message received.',
       successBody:
-        'Thanks, {name} — your enquiry is with our team. We’ll be in touch at {email} within two business days.',
-      hours: 'Mon–Fri · 8:00–18:00 PT'
+        'Thanks, {name} — your enquiry is with our team. We’ll be in touch at {email} within two business days.'
     },
     projects: {
       eyebrow: 'Projects',

@@ -8,13 +8,7 @@ export const company = {
   name: 'Korrente',
   foundedYear: 2011,
   email: 'info@korrente.com',
-  pressEmail: 'press@korrente.com',
-  phone: '+1 (415) 555-0147',
-  address: {
-    line1: '210 Foundry Street, Suite 400',
-    line2: 'Oakland, CA 94607',
-    country: 'United States'
-  }
+  pressEmail: 'press@korrente.com'
 }
 
 /* Primary navigation — matches the reference header */

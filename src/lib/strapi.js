@@ -444,3 +444,59 @@ export async function fetchTechnologyPage() {
     return TECHNOLOGY_PAGE_FALLBACK
   }
 }
+
+/* Contact page — a Strapi single type, so `data` is one object, not an
+   array. Fallback matches the copy previously hardcoded in src/i18n/ui.js
+   under `contact.eyebrow`/`.title`/`.lead`/`.infoTitle`/`.note` plus the
+   label/value pairs that used to come from src/i18n/ui.js `contact.label*`
+   and src/data/site.js `company.email`/`.phone`/`.address`. Detail
+   `iconKey` values are semantic (email/phone/location/hours), not Icon
+   component names — Contact.jsx maps them to icons (and mailto:/tel: link
+   behaviour) in code, same as TECHNOLOGY_PAGE_FALLBACK's capabilities. The
+   HQ address value is multi-line — the `\n`s are preserved through the
+   fallback and the CMS value alike, so the renderer only needs one
+   newline-to-<br/> pass regardless of source. Per-field fallback, same
+   approach as mapTechnologyPage. */
+export const CONTACT_PAGE_FALLBACK = {
+  heroEyebrow: 'Contact',
+  heroHeading: 'Let’s talk about your energy.',
+  heroSubhead:
+    'Whether you’re bringing a site, a load, or a target, our development team will point you to the fastest credible path to clean power.',
+
+  directHeading: 'Reach us directly',
+  responseNote: 'Typical response time is under two business days.',
+
+  details: [
+    { iconKey: 'email', label: 'Email', value: 'info@korrente.com' },
+    { iconKey: 'phone', label: 'Phone', value: '+1 (415) 555-0147' },
+    { iconKey: 'location', label: 'Headquarters', value: '210 Foundry Street, Suite 400\nOakland, CA 94607\nUnited States' },
+    { iconKey: 'hours', label: 'Office hours', value: 'Mon–Fri · 8:00–18:00 PT' }
+  ]
+}
+
+function mapContactPage(item) {
+  const details = item.details || []
+
+  return {
+    heroEyebrow: item.heroEyebrow ?? CONTACT_PAGE_FALLBACK.heroEyebrow,
+    heroHeading: item.heroHeading ?? CONTACT_PAGE_FALLBACK.heroHeading,
+    heroSubhead: item.heroSubhead ?? CONTACT_PAGE_FALLBACK.heroSubhead,
+
+    directHeading: item.directHeading ?? CONTACT_PAGE_FALLBACK.directHeading,
+    responseNote: item.responseNote ?? CONTACT_PAGE_FALLBACK.responseNote,
+
+    details: details.length
+      ? details.map((d) => ({ iconKey: d.iconKey, label: d.label, value: d.value }))
+      : CONTACT_PAGE_FALLBACK.details
+  }
+}
+
+export async function fetchContactPage() {
+  try {
+    const json = await fetchJson('contact-page?populate=*')
+    return json.data ? mapContactPage(json.data) : CONTACT_PAGE_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static contact page copy:', err)
+    return CONTACT_PAGE_FALLBACK
+  }
+}

@@ -1,20 +1,54 @@
-import { useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import Seo from '../components/Seo.jsx'
 import PageHero from '../components/PageHero.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
-import { company } from '../data/site.js'
+import { fetchContactPage, CONTACT_PAGE_FALLBACK } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Contact.css'
 
 const initialForm = { name: '', email: '', company: '', topic: '', message: '' }
 
+// Detail iconKeys are semantic (what the row is), not Icon component names —
+// map them to icons and link behaviour here, same as Home's featureCards.
+const detailIcons = {
+  email: 'mail',
+  phone: 'phone',
+  location: 'pin',
+  hours: 'clock'
+}
+
+function DetailValue({ iconKey, value }) {
+  if (iconKey === 'email') return <a href={`mailto:${value}`}>{value}</a>
+  if (iconKey === 'phone') return <a href={`tel:${value.replace(/[^+\d]/g, '')}`}>{value}</a>
+  if (iconKey === 'location') {
+    return (
+      <address>
+        {value.split('\n').map((line, i, arr) => (
+          <Fragment key={i}>
+            {line}
+            {i < arr.length - 1 && <br />}
+          </Fragment>
+        ))}
+      </address>
+    )
+  }
+  return <span>{value}</span>
+}
+
 export default function Contact() {
   const { t, lang } = useI18n()
+  const [page, setPage] = useState(CONTACT_PAGE_FALLBACK)
   const [values, setValues] = useState(initialForm)
   const [errors, setErrors] = useState({})
   const [touched, setTouched] = useState({})
   const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    fetchContactPage()
+      .then(setPage)
+      .catch((err) => console.warn('Falling back to static contact page copy:', err))
+  }, [])
 
   const seo = {
     title: 'Contact',
@@ -73,51 +107,28 @@ export default function Contact() {
     <>
       <Seo title={seo.title} description={seo.description} path="/contact" />
 
-      <PageHero eyebrow={t('contact.eyebrow')} title={t('contact.title')} lead={t('contact.lead')} />
+      <PageHero eyebrow={page.heroEyebrow} title={page.heroHeading} lead={page.heroSubhead} />
 
       <section className="surface-light section">
         <div className="container contact-grid">
           {/* Details */}
           <Reveal className="contact-info">
-            <h2 className="h4">{t('contact.infoTitle')}</h2>
+            <h2 className="h4">{page.directHeading}</h2>
             <ul className="contact-info__list" role="list">
-              <li>
-                <span className="contact-info__icon"><Icon name="mail" size={20} /></span>
-                <div>
-                  <span className="contact-info__label">{t('contact.labelEmail')}</span>
-                  <a href={`mailto:${company.email}`}>{company.email}</a>
-                </div>
-              </li>
-              <li>
-                <span className="contact-info__icon"><Icon name="phone" size={20} /></span>
-                <div>
-                  <span className="contact-info__label">{t('contact.labelPhone')}</span>
-                  <a href={`tel:${company.phone.replace(/[^+\d]/g, '')}`}>{company.phone}</a>
-                </div>
-              </li>
-              <li>
-                <span className="contact-info__icon"><Icon name="pin" size={20} /></span>
-                <div>
-                  <span className="contact-info__label">{t('contact.labelHq')}</span>
-                  <address>
-                    {company.address.line1}<br />
-                    {company.address.line2}<br />
-                    {company.address.country}
-                  </address>
-                </div>
-              </li>
-              <li>
-                <span className="contact-info__icon"><Icon name="clock" size={20} /></span>
-                <div>
-                  <span className="contact-info__label">{t('contact.labelHours')}</span>
-                  <span>{t('contact.hours')}</span>
-                </div>
-              </li>
+              {page.details.map((d, i) => (
+                <li key={i}>
+                  <span className="contact-info__icon"><Icon name={detailIcons[d.iconKey]} size={20} /></span>
+                  <div>
+                    <span className="contact-info__label">{d.label}</span>
+                    <DetailValue iconKey={d.iconKey} value={d.value} />
+                  </div>
+                </li>
+              ))}
             </ul>
 
             <div className="contact-info__note">
               <Icon name="spark" size={18} />
-              <p>{t('contact.note')}</p>
+              <p>{page.responseNote}</p>
             </div>
           </Reveal>
 
