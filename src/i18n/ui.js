@@ -75,10 +75,6 @@ export const ui = {
       whyLead:
         'We don’t hand projects off. We build them to run for decades — and we’re still there on year twenty.'
     },
-    stats: {
-      eyebrow: 'Impact',
-      heading: 'Measured in gigawatts and greenhouse gas that never happened.'
-    },
     testimonials: {
       prev: 'Previous testimonial',
       next: 'Next testimonial',

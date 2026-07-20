@@ -41,14 +41,6 @@ export const values = [
   }
 ]
 
-/* Impact stats with animated counters. `value` is the numeric target. */
-export const stats = [
-  { id: 'operation', value: 2.5, decimals: 1, suffix: ' GWh+', label: 'Projects in operation and under construction' },
-  { id: 'countries', value: 10, decimals: 0, suffix: '+', label: 'Countries across Europe' },
-  { id: 'pipeline', value: 1.2, decimals: 1, suffix: ' GW+', label: 'Pipeline capacity' },
-  { id: 'focus', value: 100, decimals: 0, suffix: '%', label: 'Focused on energy storage' }
-]
-
 export const testimonials = [
   {
     id: 't1',

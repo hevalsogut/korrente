@@ -7,7 +7,7 @@ import Icon from '../components/Icon.jsx'
 import StatsBand from '../components/StatsBand.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import { projects as staticProjects } from '../data/content.js'
-import { fetchProjects } from '../lib/strapi.js'
+import { fetchProjects, fetchGlobal, GLOBAL_FALLBACK } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Projects.css'
 
@@ -20,11 +20,18 @@ export const statusKey = {
 export default function Projects() {
   const { t, pick, lang } = useI18n()
   const [projects, setProjects] = useState(staticProjects)
+  const [global, setGlobal] = useState(GLOBAL_FALLBACK)
 
   useEffect(() => {
     fetchProjects()
       .then(setProjects)
       .catch((err) => console.warn('Falling back to static projects:', err))
+  }, [])
+
+  useEffect(() => {
+    fetchGlobal()
+      .then(setGlobal)
+      .catch((err) => console.warn('Falling back to static global CTA copy:', err))
   }, [])
 
   const seo = {
@@ -66,7 +73,7 @@ export default function Projects() {
         </div>
       </section>
 
-      <StatsBand />
+      <StatsBand eyebrow={global.impactEyebrow} heading={global.impactHeading} stats={global.impactStats} />
 
       <ContactCTA />
     </>

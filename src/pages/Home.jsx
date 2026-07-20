@@ -4,15 +4,14 @@ import Seo from '../components/Seo.jsx'
 import Button from '../components/Button.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
-import Counter from '../components/Counter.jsx'
 import HeroScene from '../components/HeroScene.jsx'
 import SectionHeading from '../components/SectionHeading.jsx'
 import ServiceCard from '../components/ServiceCard.jsx'
+import StatsBand from '../components/StatsBand.jsx'
 import Testimonials from '../components/Testimonials.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import { services as staticServices } from '../data/services.js'
-import { fetchHomePage, fetchSolutions, HOME_PAGE_FALLBACK } from '../lib/strapi.js'
-import '../components/StatsBand.css'
+import { fetchHomePage, fetchSolutions, fetchGlobal, HOME_PAGE_FALLBACK, GLOBAL_FALLBACK } from '../lib/strapi.js'
 import './Home.css'
 
 // Maps a CMS-supplied iconKey to the Icon name it already renders.
@@ -21,20 +20,10 @@ const FEATURE_ICONS = { storage: 'battery', integration: 'grid', europe: 'compas
 // Maps a CMS-supplied solution iconKey to the Icon name it should render.
 const SOLUTION_ICONS = { solar: 'sun', wind: 'wind', storage: 'battery', grid: 'grid', hydrogen: 'molecule', advisory: 'compass' }
 
-// Stats come from the CMS as a single display string (e.g. "2.5 GWh+"). Split
-// off the leading number so Counter can still animate the count-up; anything
-// after it (unit, "+", "%"...) is passed straight through as a suffix.
-function parseStatValue(value) {
-  const match = /^(\d+(?:\.\d+)?)/.exec(value || '')
-  if (!match) return null
-  const [numeric] = match
-  const decimals = numeric.includes('.') ? numeric.split('.')[1].length : 0
-  return { value: parseFloat(numeric), decimals, suffix: value.slice(numeric.length) }
-}
-
 export default function Home() {
   const [home, setHome] = useState(HOME_PAGE_FALLBACK)
   const [services, setServices] = useState(staticServices)
+  const [global, setGlobal] = useState(GLOBAL_FALLBACK)
 
   useEffect(() => {
     fetchHomePage()
@@ -46,6 +35,12 @@ export default function Home() {
     fetchSolutions()
       .then(setServices)
       .catch((err) => console.warn('Falling back to static solutions:', err))
+  }, [])
+
+  useEffect(() => {
+    fetchGlobal()
+      .then(setGlobal)
+      .catch((err) => console.warn('Falling back to static global CTA copy:', err))
   }, [])
 
   const seo = {
@@ -186,32 +181,7 @@ export default function Home() {
       </section>
 
       {/* ---------- IMPACT ---------- */}
-      <section className="stats-band surface-darker section" aria-label={home.impactEyebrow}>
-        <div className="container">
-          <Reveal className="stats-band__head">
-            <span className="eyebrow">{home.impactEyebrow}</span>
-            <h2 className="h3 stats-band__heading">{home.impactHeading}</h2>
-          </Reveal>
-
-          <dl className="stats-band__grid">
-            {home.stats.map((stat, i) => {
-              const parsed = parseStatValue(stat.value)
-              return (
-                <Reveal as="div" className="stat" key={i} delay={i * 90}>
-                  <dd className="stat__value">
-                    {parsed ? (
-                      <Counter value={parsed.value} decimals={parsed.decimals} suffix={parsed.suffix} />
-                    ) : (
-                      stat.value
-                    )}
-                  </dd>
-                  <dt className="stat__label">{stat.label}</dt>
-                </Reveal>
-              )
-            })}
-          </dl>
-        </div>
-      </section>
+      <StatsBand eyebrow={global.impactEyebrow} heading={global.impactHeading} stats={global.impactStats} />
 
       {/* ---------- TESTIMONIALS ---------- */}
       {home.partnersEnabled && (

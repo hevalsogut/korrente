@@ -173,11 +173,12 @@ export async function fetchSolutionsPage() {
    Site is English-only, so fields are plain strings (no {en,tr} wrapping).
    Fallback matches the copy previously hardcoded in src/i18n/ui.js under
    `home.*` (heroTitleStart/Accent/End, features, partnersLabel, intro*,
-   solutions*, why*), `common.discoverMore`/`.allSolutions`, `stats.*`,
-   plus src/data/content.js `values`/`stats` and the partner name list
-   that used to live directly in Home.jsx. The closing CTA copy lives in
-   the Global single type (see GLOBAL_FALLBACK/fetchGlobal below) — it's
-   shared across every page, not Home-specific. */
+   solutions*, why*), `common.discoverMore`/`.allSolutions`,
+   plus src/data/content.js `values` and the partner name list that used
+   to live directly in Home.jsx. The closing CTA copy AND the Impact
+   stats band live in the Global single type (see GLOBAL_FALLBACK/
+   fetchGlobal below) — shared across every page, not Home-specific,
+   since Projects also shows the same Impact band. */
 export const HOME_PAGE_FALLBACK = {
   heroHeadingLine1: 'We manage ',
   heroHeadingHighlight: 'energy flow.',
@@ -249,15 +250,6 @@ export const HOME_PAGE_FALLBACK = {
     }
   ],
 
-  impactEyebrow: 'Impact',
-  impactHeading: 'Measured in gigawatts and greenhouse gas that never happened.',
-  stats: [
-    { value: '2.5 GWh+', label: 'Projects in operation and under construction' },
-    { value: '10+', label: 'Countries across Europe' },
-    { value: '1.2 GW+', label: 'Pipeline capacity' },
-    { value: '100%', label: 'Focused on energy storage' }
-  ],
-
   partnersEnabled: true,
   partnersEyebrow: 'Partners',
   partnersHeading: 'Trusted by the utilities and industries we power.',
@@ -290,7 +282,6 @@ function mapHomePage(item) {
   const featureCards = item.featureCards || []
   const logos = item.logos || []
   const reasons = item.reasons || []
-  const stats = item.stats || []
   const testimonials = item.testimonials || []
 
   return {
@@ -330,10 +321,6 @@ function mapHomePage(item) {
       ? reasons.map((r) => ({ title: r.title, description: r.description }))
       : HOME_PAGE_FALLBACK.reasons,
 
-    impactEyebrow: item.impactEyebrow || HOME_PAGE_FALLBACK.impactEyebrow,
-    impactHeading: item.impactHeading || HOME_PAGE_FALLBACK.impactHeading,
-    stats: stats.length ? stats.map((s) => ({ value: s.value, label: s.label })) : HOME_PAGE_FALLBACK.stats,
-
     // `??`, not `||` — a CMS editor setting this to false must stay false,
     // not silently fall back to the static default of true.
     partnersEnabled: item.partnersEnabled ?? HOME_PAGE_FALLBACK.partnersEnabled,
@@ -355,12 +342,14 @@ export async function fetchHomePage() {
   }
 }
 
-/* Global — a Strapi single type holding the shared "Let's build" closing
-   CTA, reused at the foot of every page via ContactCTA. One edit here
-   updates every page at once. Fallback matches the copy previously
-   hardcoded on the Home page (src/i18n/ui.js `cta.*`, plus
-   src/data/site.js `email`). Per-field fallback, same approach as
-   mapHomePage, so a blank field degrades to the static default. */
+/* Global — a Strapi single type holding content shared across pages: the
+   "Let's build" closing CTA (reused at the foot of every page via
+   ContactCTA) and the Impact stats band (reused by Home and Projects via
+   StatsBand). One edit here updates every page at once. Fallback matches
+   the copy previously hardcoded on the Home page (src/i18n/ui.js `cta.*`
+   and `stats.*`, plus src/data/site.js `email` and src/data/content.js
+   `stats`). Per-field fallback, same approach as mapHomePage. Has a
+   component (impactStats), so the fetch needs `?populate=*`. */
 export const GLOBAL_FALLBACK = {
   ctaEyebrow: 'Let’s build',
   ctaHeading: 'Ready to power what comes next?',
@@ -368,23 +357,40 @@ export const GLOBAL_FALLBACK = {
     'Tell us about your site, your load, or your decarbonisation target. Our development team will come back within two business days.',
   ctaButtonLabel: 'Start a project',
   ctaButtonLink: '/contact',
-  ctaEmail: 'info@korrente.com'
+  ctaEmail: 'info@korrente.com',
+
+  impactEyebrow: 'Impact',
+  impactHeading: 'Measured in gigawatts and greenhouse gas that never happened.',
+  impactStats: [
+    { value: '2.5 GWh+', label: 'Projects in operation and under construction' },
+    { value: '10+', label: 'Countries across Europe' },
+    { value: '1.2 GW+', label: 'Pipeline capacity' },
+    { value: '100%', label: 'Focused on energy storage' }
+  ]
 }
 
 function mapGlobal(item) {
+  const impactStats = item.impactStats || []
+
   return {
     ctaEyebrow: item.ctaEyebrow || GLOBAL_FALLBACK.ctaEyebrow,
     ctaHeading: item.ctaHeading || GLOBAL_FALLBACK.ctaHeading,
     ctaSubhead: item.ctaSubhead || GLOBAL_FALLBACK.ctaSubhead,
     ctaButtonLabel: item.ctaButtonLabel || GLOBAL_FALLBACK.ctaButtonLabel,
     ctaButtonLink: item.ctaButtonLink || GLOBAL_FALLBACK.ctaButtonLink,
-    ctaEmail: item.ctaEmail || GLOBAL_FALLBACK.ctaEmail
+    ctaEmail: item.ctaEmail || GLOBAL_FALLBACK.ctaEmail,
+
+    impactEyebrow: item.impactEyebrow ?? GLOBAL_FALLBACK.impactEyebrow,
+    impactHeading: item.impactHeading ?? GLOBAL_FALLBACK.impactHeading,
+    impactStats: impactStats.length
+      ? impactStats.map((s) => ({ value: s.value, label: s.label }))
+      : GLOBAL_FALLBACK.impactStats
   }
 }
 
 export async function fetchGlobal() {
   try {
-    const json = await fetchJson('global')
+    const json = await fetchJson('global?populate=*')
     return json.data ? mapGlobal(json.data) : GLOBAL_FALLBACK
   } catch (err) {
     console.warn('Falling back to static global CTA copy:', err)
@@ -500,3 +506,4 @@ export async function fetchContactPage() {
     return CONTACT_PAGE_FALLBACK
   }
 }
+
