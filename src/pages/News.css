@@ -237,38 +237,3 @@
 @media (max-width: 560px) {
   .news-grid { grid-template-columns: 1fr; }
 }
-
-/* Newsletter */
-.newsletter {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(1.5rem, 5vw, 4rem);
-  align-items: center;
-  padding: clamp(2rem, 5vw, 3.5rem);
-  border-radius: var(--radius-xl);
-  background: linear-gradient(150deg, var(--ink-700), var(--ink-900));
-  border: 1px solid var(--ink-600);
-}
-.newsletter__text h2 { margin: var(--space-xs) 0; }
-.newsletter__form {
-  display: flex;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-}
-.newsletter__input {
-  flex: 1 1 220px;
-  padding: 0.9rem 1.1rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--ink-600);
-  background: var(--ink-900);
-  color: var(--text-on-dark);
-  transition: border-color var(--dur) var(--ease-out);
-}
-.newsletter__input::placeholder { color: var(--text-on-dark-faint); }
-.newsletter__input:focus-visible {
-  outline: none;
-  border-color: var(--lime-500);
-}
-@media (max-width: 760px) {
-  .newsletter { grid-template-columns: 1fr; }
-}

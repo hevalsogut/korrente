@@ -6,7 +6,7 @@ import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import { articles as staticArticles } from '../data/content.js'
-import { fetchArticles } from '../lib/strapi.js'
+import { fetchArticles, fetchNewsPage, NEWS_PAGE_FALLBACK } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './News.css'
 
@@ -16,11 +16,18 @@ export default function News() {
   const { t, pick, lang } = useI18n()
   const [filter, setFilter] = useState(ALL)
   const [articles, setArticles] = useState(staticArticles)
+  const [page, setPage] = useState(NEWS_PAGE_FALLBACK)
 
   useEffect(() => {
     fetchArticles()
       .then(setArticles)
       .catch((err) => console.warn('Falling back to static articles:', err))
+  }, [])
+
+  useEffect(() => {
+    fetchNewsPage()
+      .then(setPage)
+      .catch((err) => console.warn('Falling back to static news page copy:', err))
   }, [])
 
   const formatDate = (iso) =>
@@ -52,7 +59,7 @@ export default function News() {
     <>
       <Seo title={seo.title} description={seo.description} path="/news" />
 
-      <PageHero eyebrow={t('news.eyebrow')} title={t('news.title')} lead={t('news.lead')} />
+      <PageHero eyebrow={page.heroEyebrow} title={page.heroHeading} lead={page.heroSubhead} />
 
       {/* Featured */}
       <section className="surface-light section--tight">
@@ -97,7 +104,7 @@ export default function News() {
       {/* Filters + grid */}
       <section className="surface-light section--tight">
         <div className="container">
-          <div className="news-filters" role="tablist" aria-label={t('news.eyebrow')}>
+          <div className="news-filters" role="tablist" aria-label={page.heroEyebrow}>
             {categories.map((cat) => (
               <button
                 key={cat.key}
@@ -146,41 +153,6 @@ export default function News() {
           </div>
 
           {visible.length === 0 && <p className="news-empty text-muted">{t('news.empty')}</p>}
-        </div>
-      </section>
-
-      {/* Newsletter */}
-      <section className="surface-dark section">
-        <div className="container">
-          <Reveal className="newsletter">
-            <div className="newsletter__text">
-              <span className="eyebrow">{t('news.newsletterEyebrow')}</span>
-              <h2 className="h3">{t('news.newsletterTitle')}</h2>
-              <p className="text-muted">{t('news.newsletterBody')}</p>
-            </div>
-            <form
-              className="newsletter__form"
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.currentTarget.reset()
-              }}
-            >
-              <label className="sr-only" htmlFor="newsletter-email">
-                {t('contact.labelEmail')}
-              </label>
-              <input
-                id="newsletter-email"
-                type="email"
-                required
-                placeholder={t('news.emailPlaceholder')}
-                className="newsletter__input"
-              />
-              <button type="submit" className="btn btn--primary btn--md newsletter__submit">
-                <span className="btn__label">{t('common.subscribe')}</span>
-                <Icon name="arrow" size={18} className="btn__icon" />
-              </button>
-            </form>
-          </Reveal>
         </div>
       </section>
 

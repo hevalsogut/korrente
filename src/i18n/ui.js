@@ -20,7 +20,6 @@ export const ui = {
       viewSolutions: 'View solutions',
       sendMessage: 'Send message',
       sendAnother: 'Send another message',
-      subscribe: 'Subscribe',
       readArticle: 'Read the article',
       readSuffix: 'read',
       skip: 'Skip to content',
@@ -117,25 +116,15 @@ export const ui = {
       ]
     },
     news: {
-      eyebrow: 'Insights',
-      title: 'Notes from the front line of the energy transition.',
-      lead:
-        'Field reports, technical deep-dives, and honest takes from the people building and operating clean energy every day.',
       featured: 'Featured',
       all: 'All',
       empty: 'No articles in this category yet — check back soon.',
-      newsletterEyebrow: 'Stay in the loop',
-      newsletterTitle: 'Get our monthly field notes.',
-      newsletterBody:
-        'One considered email a month on clean energy, the grid, and what we’re learning building it. No noise.',
-      emailPlaceholder: 'you@company.com',
       backToNews: 'Back to Insights',
       loading: 'Loading article…',
       notFoundTitle: 'Article not found.',
       notFoundBody: 'This article may have moved or never existed.'
     },
     contact: {
-      labelEmail: 'Email',
       fieldName: 'Name',
       fieldEmail: 'Email',
       fieldCompany: 'Company',

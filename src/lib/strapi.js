@@ -558,3 +558,34 @@ export async function fetchProjectsPage() {
     return PROJECTS_PAGE_FALLBACK
   }
 }
+
+/* News page — a Strapi single type, so `data` is one object, not an array.
+   Only the intro header lives here; the article list itself comes from
+   the Article collection (fetchArticles above) and is untouched. Fallback
+   matches the copy previously hardcoded in src/i18n/ui.js under
+   `news.eyebrow`/`.title`/`.lead`. Scalars only — no component, so no
+   `populate` needed. */
+export const NEWS_PAGE_FALLBACK = {
+  heroEyebrow: 'Insights',
+  heroHeading: 'Notes from the front line of the energy transition.',
+  heroSubhead:
+    'Field reports, technical deep-dives, and honest takes from the people building and operating clean energy every day.'
+}
+
+function mapNewsPage(item) {
+  return {
+    heroEyebrow: item.heroEyebrow ?? NEWS_PAGE_FALLBACK.heroEyebrow,
+    heroHeading: item.heroHeading ?? NEWS_PAGE_FALLBACK.heroHeading,
+    heroSubhead: item.heroSubhead ?? NEWS_PAGE_FALLBACK.heroSubhead
+  }
+}
+
+export async function fetchNewsPage() {
+  try {
+    const json = await fetchJson('news-page')
+    return json.data ? mapNewsPage(json.data) : NEWS_PAGE_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static news page copy:', err)
+    return NEWS_PAGE_FALLBACK
+  }
+}
