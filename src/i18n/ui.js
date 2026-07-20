@@ -180,22 +180,6 @@ export const ui = {
         'Thanks, {name} — your enquiry is with our team. We’ll be in touch at {email} within two business days.',
       hours: 'Mon–Fri · 8:00–18:00 PT'
     },
-    technology: {
-      eyebrow: 'Technology',
-      title: 'The intelligence behind every megawatt.',
-      lead:
-        'Korrente Grid is the software layer across our fleet — forecasting, dispatching, and optimising storage and generation in real time.',
-      platformEyebrow: 'The platform',
-      platformTitle: 'One control layer for a flexible grid.',
-      platformLead:
-        'Purpose-built to make renewables and storage behave like firm, plannable power.',
-      capabilities: [
-        { title: 'Sub-hourly forecasting', body: 'High-resolution generation and demand forecasts that turn variable renewables into a plannable resource.' },
-        { title: 'Automated dispatch', body: 'Storage is co-optimised against live market prices and dispatched automatically, second by second.' },
-        { title: 'Predictive maintenance', body: 'Sensor telemetry flags degradation early, so assets are serviced before they ever fault.' },
-        { title: 'Open integration', body: 'Standards-based APIs connect to SCADA, market operators, and third-party assets with no lock-in.' }
-      ]
-    },
     projects: {
       eyebrow: 'Projects',
       title: 'Infrastructure we’ve built and run.',

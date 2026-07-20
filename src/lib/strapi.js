@@ -391,3 +391,56 @@ export async function fetchGlobal() {
     return GLOBAL_FALLBACK
   }
 }
+
+/* Technology page — a Strapi single type, so `data` is one object, not an
+   array. Fallback matches the copy previously hardcoded in src/i18n/ui.js
+   under `technology.*`. Capability `iconKey` values are semantic
+   (forecasting/dispatch/maintenance/integration), not Icon component names —
+   Technology.jsx maps them to icons in code, same as HOME_PAGE_FALLBACK's
+   featureCards. Per-field fallback, same approach as mapHomePage. */
+export const TECHNOLOGY_PAGE_FALLBACK = {
+  heroEyebrow: 'Technology',
+  heroHeading: 'The intelligence behind every megawatt.',
+  heroSubhead:
+    'Korrente Grid is the software layer across our fleet — forecasting, dispatching, and optimising storage and generation in real time.',
+
+  platformEyebrow: 'The platform',
+  platformHeading: 'One control layer for a flexible grid.',
+  platformSubhead:
+    'Purpose-built to make renewables and storage behave like firm, plannable power.',
+
+  capabilities: [
+    { iconKey: 'forecasting', title: 'Sub-hourly forecasting', description: 'High-resolution generation and demand forecasts that turn variable renewables into a plannable resource.' },
+    { iconKey: 'dispatch', title: 'Automated dispatch', description: 'Storage is co-optimised against live market prices and dispatched automatically, second by second.' },
+    { iconKey: 'maintenance', title: 'Predictive maintenance', description: 'Sensor telemetry flags degradation early, so assets are serviced before they ever fault.' },
+    { iconKey: 'integration', title: 'Open integration', description: 'Standards-based APIs connect to SCADA, market operators, and third-party assets with no lock-in.' }
+  ]
+}
+
+function mapTechnologyPage(item) {
+  const capabilities = item.capabilities || []
+
+  return {
+    heroEyebrow: item.heroEyebrow ?? TECHNOLOGY_PAGE_FALLBACK.heroEyebrow,
+    heroHeading: item.heroHeading ?? TECHNOLOGY_PAGE_FALLBACK.heroHeading,
+    heroSubhead: item.heroSubhead ?? TECHNOLOGY_PAGE_FALLBACK.heroSubhead,
+
+    platformEyebrow: item.platformEyebrow ?? TECHNOLOGY_PAGE_FALLBACK.platformEyebrow,
+    platformHeading: item.platformHeading ?? TECHNOLOGY_PAGE_FALLBACK.platformHeading,
+    platformSubhead: item.platformSubhead ?? TECHNOLOGY_PAGE_FALLBACK.platformSubhead,
+
+    capabilities: capabilities.length
+      ? capabilities.map((c) => ({ iconKey: c.iconKey, title: c.title, description: c.description }))
+      : TECHNOLOGY_PAGE_FALLBACK.capabilities
+  }
+}
+
+export async function fetchTechnologyPage() {
+  try {
+    const json = await fetchJson('technology-page?populate=*')
+    return json.data ? mapTechnologyPage(json.data) : TECHNOLOGY_PAGE_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static technology page copy:', err)
+    return TECHNOLOGY_PAGE_FALLBACK
+  }
+}
