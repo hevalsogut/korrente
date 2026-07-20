@@ -507,3 +507,33 @@ export async function fetchContactPage() {
   }
 }
 
+/* Projects page — a Strapi single type, so `data` is one object, not an
+   array. Only the hero intro lives here; the project cards themselves
+   come from the Project collection (fetchProjects above) and are
+   untouched. Fallback matches the copy previously hardcoded in
+   src/i18n/ui.js under `projects.eyebrow`/`.title`/`.lead`. Scalars
+   only — no component, so no `populate` needed. */
+export const PROJECTS_PAGE_FALLBACK = {
+  heroEyebrow: 'Projects',
+  heroHeading: 'Infrastructure we’ve built and run.',
+  heroSubhead:
+    'A selection of storage and generation projects Korrente has developed, built, and operates across Europe.'
+}
+
+function mapProjectsPage(item) {
+  return {
+    heroEyebrow: item.heroEyebrow ?? PROJECTS_PAGE_FALLBACK.heroEyebrow,
+    heroHeading: item.heroHeading ?? PROJECTS_PAGE_FALLBACK.heroHeading,
+    heroSubhead: item.heroSubhead ?? PROJECTS_PAGE_FALLBACK.heroSubhead
+  }
+}
+
+export async function fetchProjectsPage() {
+  try {
+    const json = await fetchJson('projects-page')
+    return json.data ? mapProjectsPage(json.data) : PROJECTS_PAGE_FALLBACK
+  } catch (err) {
+    console.warn('Falling back to static projects page copy:', err)
+    return PROJECTS_PAGE_FALLBACK
+  }
+}

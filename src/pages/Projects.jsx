@@ -7,7 +7,7 @@ import Icon from '../components/Icon.jsx'
 import StatsBand from '../components/StatsBand.jsx'
 import ContactCTA from '../components/ContactCTA.jsx'
 import { projects as staticProjects } from '../data/content.js'
-import { fetchProjects, fetchGlobal, GLOBAL_FALLBACK } from '../lib/strapi.js'
+import { fetchProjects, fetchProjectsPage, fetchGlobal, PROJECTS_PAGE_FALLBACK, GLOBAL_FALLBACK } from '../lib/strapi.js'
 import { useI18n } from '../i18n/index.jsx'
 import './Projects.css'
 
@@ -20,12 +20,19 @@ export const statusKey = {
 export default function Projects() {
   const { t, pick, lang } = useI18n()
   const [projects, setProjects] = useState(staticProjects)
+  const [page, setPage] = useState(PROJECTS_PAGE_FALLBACK)
   const [global, setGlobal] = useState(GLOBAL_FALLBACK)
 
   useEffect(() => {
     fetchProjects()
       .then(setProjects)
       .catch((err) => console.warn('Falling back to static projects:', err))
+  }, [])
+
+  useEffect(() => {
+    fetchProjectsPage()
+      .then(setPage)
+      .catch((err) => console.warn('Falling back to static projects page copy:', err))
   }, [])
 
   useEffect(() => {
@@ -42,7 +49,7 @@ export default function Projects() {
   return (
     <>
       <Seo title={seo.title} description={seo.description} path="/projects" />
-      <PageHero eyebrow={t('projects.eyebrow')} title={t('projects.title')} lead={t('projects.lead')} />
+      <PageHero eyebrow={page.heroEyebrow} title={page.heroHeading} lead={page.heroSubhead} />
 
       <section className="surface-dark section">
         <div className="container">

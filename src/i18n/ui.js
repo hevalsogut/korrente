@@ -167,10 +167,6 @@ export const ui = {
         'Thanks, {name} — your enquiry is with our team. We’ll be in touch at {email} within two business days.'
     },
     projects: {
-      eyebrow: 'Projects',
-      title: 'Infrastructure we’ve built and run.',
-      lead:
-        'A selection of storage and generation projects Korrente has developed, built, and operates across Europe.',
       statusOperational: 'Operational',
       statusConstruction: 'Under construction',
       statusDevelopment: 'In development',
