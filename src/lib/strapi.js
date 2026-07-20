@@ -530,7 +530,7 @@ function mapProjectsPage(item) {
 
 export async function fetchProjectsPage() {
   try {
-    const json = await fetchJson('projects-page')
+    const json = await fetchJson('project-page')
     return json.data ? mapProjectsPage(json.data) : PROJECTS_PAGE_FALLBACK
   } catch (err) {
     console.warn('Falling back to static projects page copy:', err)
