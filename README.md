@@ -77,12 +77,14 @@ korrente/
 │   ├── data/                 # ⭐ EDITABLE CONTENT
 │   │   ├── site.js           #   company details, nav, footer, legal
 │   │   ├── services.js       #   the six solutions/services
-│   │   ├── calculatorConfig.js # Revenue calculator defaults
+│   │   ├── calculatorConfig.js # Revenue calculator assumptions/defaults
+│   │   ├── pageVisibility.js #   which pages are on/off (fallback defaults)
 │   │   └── content.js        #   values, stats, testimonials,
 │   │                         #   commitments, articles, projects (fallback data)
 │   ├── lib/
-│   │   ├── calculator.js     #   Revenue calculator pure math functions
-│   │   └── strapi.js         #   Strapi fetch helpers (articles, projects)
+│   │   ├── calculator.js     #   Revenue calculator pure math (calculateRevenue)
+│   │   ├── pageVisibility.jsx #  page-visibility context + hook
+│   │   └── strapi.js         #   Strapi fetch helpers (articles, projects, singles)
 │   ├── components/           # reusable UI (Header, Footer, Button, Reveal,
 │   │                         #   Counter, Icon, HeroScene…)
 │   └── pages/                # one folder-mate .jsx + .css per page
@@ -123,71 +125,166 @@ down), it logs a `console.warn` and keeps rendering the static fallback — the
 page never shows an error state, and `npm run build` still produces a fully
 working static site offline.
 
+This same fetch-with-fallback pattern also backs a few CMS-editable single
+types (hero copy, footer prose, SEO defaults) — the client can edit them in
+Strapi, and the site falls back to the values in `src/data/` if the CMS is
+unreachable.
+
+### Toggling pages on/off
+
+Which pages appear in the nav (and resolve as routes) is driven by a
+`page-visibility` Strapi single type, with a static fallback in
+`src/data/pageVisibility.js`. `src/lib/pageVisibility.jsx` starts from those
+defaults synchronously (so the first render already links correctly), then
+reconciles once Strapi responds — or keeps the defaults on any fetch failure.
+Home is never gated. To hide a page (e.g. temporarily pull the Calculator),
+flip its boolean in Strapi; to change the *default*, edit
+`pageVisibilityDefaults` in `src/data/pageVisibility.js`.
+
 ---
 
 ## Revenue Calculator
 
-At `/calculator`, a battery-storage revenue and lifetime-economics model that
-recalculates instantly as you type — entirely client-side, no backend or API
-calls.
+> **This is the one non-trivial subsystem in the site — read this whole section
+> before touching it.** If you only change *numbers* (prices, CAPEX, defaults),
+> you almost never need to open the math file: edit `calculatorConfig.js` and
+> run `node test.js`. If you change *how a number is computed*, read
+> "The scope rules" below first — they encode accounting rules that are easy to
+> break silently (the tests will not always catch a scope leak).
 
-**Two modes** (`CALCULATOR_MODES` in `calculatorConfig.js`):
+At `/calculator` lives a battery-storage revenue and lifetime-economics model
+that recalculates instantly as you type — entirely client-side, no backend, no
+API calls, no database. It is an **illustrative model, not investment advice**
+(the on-page disclaimer says so), built on sourced but placeholder Netherlands
+market assumptions.
 
-- **Grid arbitrage** — the battery buys low / sells high on the price spread,
-  optionally stacking FCR and/or balancing-market revenue on top.
-- **Solar + storage** — adds a co-located PV array, splitting its generation
-  between self-consumption (avoided retail import) and export (feed-in
-  tariff, or retail-parity pricing if net metering applies).
+### The three files (and the one you'll usually edit)
 
-**Battery chemistry** — a Lithium LFP / Vanadium Flow selector, available in
-both modes, loads a preset bundle of engineering + cost defaults (RTE, depth
-of discharge, degradation, project life, energy CAPEX) into the advanced
-fields below; any of them can still be overridden by hand afterwards. The
-calculation engine itself is chemistry-agnostic — it only ever sees the
-resulting numbers via an optional `rte_by_duration` override table, never a
-"chemistry" concept. The flow preset is a deliberate approximation (it swaps
-those five inputs only, not independent power/energy sizing or electrolyte
-residual value) and is calendar-dominated in its degradation — flow ages
-mainly with time (membrane crossover), not cycling, which is its core
-durability advantage over lithium.
+| File | What it is | You edit it when… |
+| --- | --- | --- |
+| **`src/data/calculatorConfig.js`** | All the *assumptions*: defaults, input min/max limits, the RTE-by-duration table, chemistry presets. Every market value carries an inline comment with its **source, URL, and set-date**. | You want to change a price, a cost, a default, or a limit. **90% of edits happen here.** |
+| **`src/lib/calculator.js`** | The *math*: `calculateRevenue(inputs)` — the entire model as one pure, dependency-free function. No React, no i18n, no side effects. | You want to change *how* a figure is computed, or add a new output. |
+| **`src/pages/Calculator.jsx`** | The *UI*: form state, the tiered layout, and result formatting (`Intl.NumberFormat` for currency/number output). | You want to change the form, add/remove a field, or change how a result is displayed. |
 
-**Inputs are tiered.** Power, duration (1/2/4 h — each maps to a fixed
-round-trip efficiency), and, in solar mode, PV size and annual consumption are
-front and centre. An "Advanced parameters" panel exposes everything else:
-CAPEX (split power-based €/kW + energy-based €/kWh), OPEX % of CAPEX, depth of
-discharge, cycles/year, project life, degradation (per-cycle + calendar),
-FCR/balancing prices and allocation %, solar specifics (yield, seasonal split,
-self-consumption rate, tariffs), discount rate, and charging price.
+The separation is deliberate: **assumptions ≠ math ≠ presentation.** Keep it
+that way. Don't hardcode a market number into the math file; don't put math into
+the UI.
 
-**FCR/balancing stacking is zero-sum** — allocating capacity % to an ancillary
-service takes it from arbitrage — and each service only becomes available
-once the selected duration clears its own minimum-duration threshold; the
-toggle is disabled with an explanation when a duration doesn't qualify.
+### How a calculation flows
 
-**Results** cover nameplate/usable energy, CAPEX and €/kWh, gross/net annual
-revenue, payback period, and ROI%, plus a capacity-allocation breakdown
-(arbitrage vs. FCR vs. balancing) and a full lifetime table — year-by-year
-state-of-health, discharged energy, and discounted net cash flow feeding into
-LCOS and NPV. Solar mode adds a self-consumed-vs-exported value split and a
-summer/winter generation bar.
+`calculateRevenue(inputs)` runs top to bottom in `calculator.js`. Every input is
+coerced from string → number and clamped to the limits in `INPUT_LIMITS`
+*first*, so it is always safe to call directly with raw form-state (the form
+never has to validate types before calling). The pipeline:
 
-| File | Role |
+1. **Pick mode & sizing.** `grid` or `solar`; power (MW) × duration (h) →
+   nominal energy `E_nom`; usable energy `E_use = E_nom × depth-of-discharge`.
+   Duration is restricted to 1/2/4 h, each mapping to a fixed round-trip
+   efficiency (RTE) from `RTE_BY_DURATION` (or a chemistry preset's override).
+2. **Battery CAPEX.** power-based (€/kW) + energy-based (€/kWh). Kept
+   **separate** from solar CAPEX on purpose (see scope rules).
+3. **Degradation → state-of-health (SoH) curve.** Annual loss =
+   `cycles/yr × per-cycle% + calendar%/yr`. Year 1 runs at 100% SoH; each later
+   year compounds the loss into a per-year SoH series (`buildSoHSeries`).
+4. **Year-1 revenue stacking.** Arbitrage (buy-low/sell-high on the spread) plus
+   optional FCR and balancing (aFRR) capacity revenue. Allocation is **zero-sum**
+   (see scope rules).
+5. **Solar (solar mode only).** PV generation split into self-consumed (avoids
+   retail import) and exported (feed-in tariff, or retail-parity price if net
+   metering applies). Adds solar CAPEX to *total* project CAPEX only.
+6. **Lifetime loop (LCOS & NPV).** Walks each project year, applying that year's
+   SoH to arbitrage throughput, discounting cash flows at the WACC, and
+   accumulating discounted energy and OPEX for LCOS. FCR/balancing/solar are
+   held flat across life in this MVP (no ancillary-price escalation or PV
+   degradation modelled yet).
+7. **Return a nested result object** (`{ E_nom_mwh, capex_eur, annual_net_eur,
+   payback_years, roi_pct, allocation, revenueSplit, solar, lifecycle: { years,
+   npv_eur, lcos_eur_per_mwh, … } }`) that the page renders directly.
+
+### The scope rules (read before changing the math)
+
+These are the traps. The inline comments in `calculator.js` state them at each
+site; here they are in one place:
+
+- **Battery-only vs. total-project CAPEX.** `battery_capex_eur` is power + energy
+  CAPEX *only*. Solar CAPEX is added afterward into `capex_eur` (the total).
+  Metrics denominated in the battery asset — **CAPEX/kWh and LCOS** — must use
+  `battery_capex_eur`; whole-project metrics — **NPV, payback, ROI** — use the
+  total `capex_eur`. Mixing a blended cost into a battery-only denominator is
+  exactly the bug that once inflated NPV to several times CAPEX.
+- **LCOS is CAPEX + discounted OPEX only — no charging cost in the numerator.**
+  `price_spread_eur_mwh` is already a *net* margin (the cost of charging is
+  baked into "spread"). Subtracting a separate charging-cost term would
+  double-count it and could flag a genuinely profitable project as "not viable."
+  Charging cost *is* computed per year (`charging_cost_eur`) but only for
+  display/transparency — never folded into LCOS.
+- **Zero-sum ancillary allocation.** Capacity given to FCR or balancing is
+  capacity taken from arbitrage; the three shares always sum to 100%. If FCR% +
+  balancing% exceed 100 they're scaled down proportionally (`allocClamped`
+  flags this to the UI).
+- **Duration-gated eligibility.** FCR and balancing each require the selected
+  duration to clear a minimum (`fcr_min_duration_h`, `balancing_min_duration_h`).
+  Below the threshold the allocation is forced to 0 and the UI disables the
+  toggle with an explanation — a 1 h battery cannot sell FCR, for example.
+- **Chemistry stays out of the math.** A chemistry preset (Lithium LFP / Vanadium
+  Flow) is just a *bundle of numbers* loaded into the advanced fields **before**
+  `calculateRevenue` runs. The engine only ever sees an optional
+  `rte_by_duration` override table — never a "chemistry" concept. Flow is a
+  deliberate approximation (it swaps five inputs, not independent power/energy
+  sizing or electrolyte residual value) and is calendar-dominated in its
+  degradation (it ages with time, not cycling — its core durability advantage).
+
+### Changing the assumptions safely
+
+`calculatorConfig.js` is organized into labelled buckets — edit the value, keep
+the sourcing comment honest (update source/URL/set-date if you change where a
+number came from):
+
+| Bucket | Holds |
 | --- | --- |
-| `src/pages/Calculator.jsx` | Form state, layout, and result formatting (bilingual, `Intl.NumberFormat` currency/number output) |
-| `src/lib/calculator.js` | `calculateRevenue(inputs)` — the whole model as one pure, dependency-free function; every field is coerced and clamped, so it's safe to call directly with raw form-state strings |
-| `src/data/calculatorConfig.js` | Defaults, input min/max limits, the RTE-by-duration table, and `CHEMISTRY_PRESETS` (Lithium LFP / Vanadium Flow) — tune assumptions here without touching the math |
+| `ADVANCED_DEFAULTS` | Spread, DoD, cycles/yr, project life, power/energy CAPEX, OPEX% |
+| `RTE_BY_DURATION` | Round-trip efficiency per 1/2/4 h (read-only in the UI) |
+| `DEGRADATION_DEFAULTS` | Per-cycle + calendar degradation |
+| `CHEMISTRY_PRESETS` | The Lithium/Flow bundles loaded into advanced fields |
+| `STACKING_DEFAULTS` | FCR/balancing prices + min-duration eligibility gates |
+| `SOLAR_DEFAULTS` | PV size, yield, seasonal split, tariffs, solar CAPEX |
+| `LIFETIME_DEFAULTS` | Discount rate (WACC), charging price |
+| `INPUT_LIMITS` | Min/max clamps applied to every field before the math runs |
 
-Because `calculateRevenue` has no React/i18n/side effects, it's straightforward
-to unit-test with plain input/output objects — `test.js` (run with `node
-test.js`) does exactly that, including a dedicated group per chemistry preset
-and mode. Read the inline comments in `calculator.js` before changing the
-math — they document scope rules (e.g. battery-only vs. total-project CAPEX,
-what LCOS is and isn't allowed to include) that are easy to accidentally
-break.
+**These are manual constants, not live feeds.** The header comment in
+`calculatorConfig.js` flags a **6–12 month refresh cadence** for market values
+(spread, CAPEX, FCR/aFRR) — they drift. Several defaults carry a
+"confirm before launch" note (e.g. which PV pairing ratio to default to,
+utility-scale vs. rooftop solar CAPEX). **Sanity check:** a valid computed LCOS
+should land in the NL utility-scale benchmark of **€120–180/MWh** — outside that
+band usually means a bad input, not a broken model.
 
-The pre-filled defaults are sourced, placeholder Netherlands market/engineering
-assumptions (see the sourcing comments in `calculatorConfig.js`) — the on-page
-disclaimer notes this is an illustrative model, not investment advice.
+### Testing the math
+
+Because `calculateRevenue` is pure, it's trivially unit-testable with plain
+input/output objects. **`test.js`** (run `node test.js`) does exactly that —
+including a dedicated group per chemistry preset and per mode. It is a
+standalone Node script, *not* wired into `package.json` and *not* a real test
+runner: it imports `calculateRevenue` and the config directly, asserts, and
+exits non-zero on any failure. To check one new behaviour, add assertions
+inline (there's no test-name filter).
+
+> **Run `node test.js` after every change to `calculator.js` or
+> `calculatorConfig.js`** — it's the only automated check the calculator has.
+
+### Glossary (for whoever inherits this)
+
+| Term | Meaning in this model |
+| --- | --- |
+| **Arbitrage** | Charging when power is cheap, discharging when it's expensive — revenue = the price *spread* captured, net of round-trip losses |
+| **RTE** | Round-trip efficiency — fraction of stored energy you get back out (losses on the round trip) |
+| **DoD** | Depth of discharge — how much of nameplate capacity is actually cycled |
+| **SoH** | State of health — remaining capacity vs. new, degrading year over year |
+| **LCOS** | Levelized cost of storage — €/MWh it costs to store+deliver energy over the asset's life (CAPEX + discounted OPEX ÷ discounted throughput). Compared to captured spread to judge arbitrage viability |
+| **NPV** | Net present value — all project cash flows discounted to today at the WACC, minus CAPEX |
+| **FCR** | Frequency Containment Reserve — a fast ancillary service; paid per MW of contracted capacity |
+| **Balancing / aFRR** | automatic Frequency Restoration Reserve — a slower ancillary service; also paid per MW of capacity |
+| **Net metering (`net_metering_2027`)** | ON = exported solar is valued at the retail import price (pre-2027 NL *salderingsregeling*); OFF = valued at the low feed-in tariff, so self-consumption becomes the driver |
 
 ---
 
@@ -259,7 +356,7 @@ file in `src/pages/`).
   `prefers-reduced-motion`. No layout shift; no render-blocking assets beyond a
   single font stylesheet.
 
-> The contact and newsletter forms are front-end only (validation + success
-> state). To make them live, POST the collected values to your backend or a
-> form service in `src/pages/Contact.jsx` (`handleSubmit`) and
-> `src/pages/News.jsx`.
+> The contact form is front-end only (inline validation + a success state); it
+> does **not** POST anywhere yet. To make it live, send the collected values to
+> your backend or a form service from `src/pages/Contact.jsx` (`handleSubmit`).
+> This is a deliberate future step, not an oversight.
